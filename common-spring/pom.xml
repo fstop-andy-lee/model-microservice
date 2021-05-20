@@ -17,7 +17,6 @@
   <version>1.0.0</version>
   
   <url>http://www.firstbank.com.tw</url>
-  
 
   <dependencies>
   
@@ -30,6 +29,17 @@
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
 	
+	<!-- validation -->
+	<dependency> 
+      <groupId>org.springframework.boot</groupId> 
+      <artifactId>spring-boot-starter-validation</artifactId> 
+    </dependency>
+    
+    <dependency>
+      <groupId>javax.validation</groupId>
+      <artifactId>validation-api</artifactId>
+    </dependency>
+
     <!-- postgresql jsonb type -->
 	<dependency>
 	  <groupId>org.hibernate</groupId>
