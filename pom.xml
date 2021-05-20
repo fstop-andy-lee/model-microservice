@@ -196,5 +196,6 @@
     <module>parent-boot-2</module>      
     <module>common-spring</module>
     <module>swift-messaging</module>
+    <module>common-module</module>
   </modules>
 </project>

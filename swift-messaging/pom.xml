@@ -18,6 +18,12 @@
   <dependencies>
     <dependency>
       <groupId>tw.com.firstbank</groupId>
+      <artifactId>common-module</artifactId>
+      <version>1.0.0</version>
+    </dependency>    
+        
+    <dependency>
+      <groupId>tw.com.firstbank</groupId>
       <artifactId>common-spring</artifactId>
       <version>1.0.0</version>
     </dependency>      
