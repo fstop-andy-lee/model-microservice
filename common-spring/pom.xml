@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" 
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+      <groupId>tw.com.firstbank</groupId>
+      <artifactId>parent-boot-2</artifactId>
+      <version>0.0.1</version>
+      <relativePath>../parent-boot-2</relativePath>
+  </parent>  
+  
+  <artifactId>common-spring</artifactId>
+  <name>common-spring</name>
+  <packaging>jar</packaging>
+  <version>1.0.0</version>
+  
+  <url>http://www.firstbank.com.tw</url>
+  
+
+  <dependencies>
+  
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-web</artifactId>
+	</dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+	
+    <!-- postgresql jsonb type -->
+	<dependency>
+	  <groupId>org.hibernate</groupId>
+	  <artifactId>hibernate-core</artifactId>
+	</dependency>
+	<!-- https://github.com/vladmihalcea/hibernate-types -->
+	<dependency>
+	  <groupId>com.vladmihalcea</groupId>
+	  <artifactId>hibernate-types-52</artifactId>
+      <version>2.9.8</version>
+	</dependency>
+	
+    <!--  datatype module to make Jackson recognize Java 8 Date & Time API data types -->				         	 
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-jsr310</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.datatype</groupId>
+      <artifactId>jackson-datatype-hibernate5</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-batch</artifactId>
+    </dependency>
+      
+	<dependency>
+		<groupId>javax.servlet</groupId>
+		<artifactId>jstl</artifactId>
+	</dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+    </dependency>
+  
+  </dependencies>
+</project>
