@@ -1,0 +1,86 @@
+server:
+  address: 0.0.0.0
+  port: 8080
+  servlet:
+    contextPath: /
+
+  error:
+    whitelabel:
+      enabled: false
+
+  compression:
+    enabled: true
+    min-response-size: 256
+    mime-types: text/html,text/xml,text/plain,application/json,application/xml,text/css,application/javascript,image/svg+xml
+
+spring:
+  application:
+    name: swift-messaging
+
+  ## enabling overriding by setting spring.main.allow-bean-definition-overriding=true
+  main:
+    allow-bean-definition-overriding: true
+
+  jpa:
+    properties:
+      hibernate:
+        enable_lazy_load_no_trans: true
+        jdbc:
+          lob:
+            non_contextual_creation: true      
+      show_sql: false
+      format_sql: false
+      ## none, validate, update, create, create-drop  
+      ddl-auto: none 
+    show-sql: false
+  
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+      write-date-timestamps-as-nanoseconds: false
+      fail-on-empty-beans: false
+
+  mvc:
+    view:
+      prefix: /WEB-INF/jsp/
+      suffix: .jsp    
+
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 31MB
+      max-request-size: 31MB
+
+  batch:
+    table-prefix: batch_
+    job:
+      enabled: false
+    # always, never
+    initialize-schema: never  
+    initializer:
+      enabled: false
+
+security:
+  basic:
+    enabled: false
+
+logging:
+  file: app.log
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level %logger{36} - %msg%n"
+  level:
+    tw.com.firstbank: DEBUG
+#    org.hibernate.SQL: DEBUG
+#    org.springframework: DEBUG
+#    org.springframework.http.client: DEBUG
+    org.springframework.web.client.RestTemplate: DEBUG
+
+jasypt:
+  encryptor:
+    algorithm: PBEWITHMD5ANDTRIPLEDES
+    password: 123qweAS
+
+feature:
+  swift-messaging: true
+      
+

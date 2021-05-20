@@ -75,19 +75,6 @@
 		<artifactId>slf4j-api</artifactId>
 		<version>${org.slf4j.version}</version>
 	</dependency>
-	
-	<!-- 不可使用，會與 infinispan 的 log 衝突
-    <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>${logback.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-core</artifactId>
-        <version>${logback.version}</version>
-    </dependency>
-    -->
     
     <!-- test -->
     <dependency>
@@ -208,5 +195,6 @@
   <modules>  
     <module>parent-boot-2</module>      
     <module>common-spring</module>
+    <module>swift-messaging</module>
   </modules>
 </project>
