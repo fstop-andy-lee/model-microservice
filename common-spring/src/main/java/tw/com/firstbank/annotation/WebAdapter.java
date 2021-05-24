@@ -7,13 +7,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.springframework.core.annotation.AliasFor;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
 
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
-@RestController
+@Controller
 public @interface WebAdapter {
-  @AliasFor(annotation = RestController.class)
+  @AliasFor(annotation = Controller.class)
   String value() default "";
 }

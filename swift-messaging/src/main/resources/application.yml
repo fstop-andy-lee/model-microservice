@@ -73,12 +73,19 @@ logging:
 #    org.hibernate.SQL: DEBUG
 #    org.springframework: DEBUG
 #    org.springframework.http.client: DEBUG
+    org.springframework.web: DEBUG
     org.springframework.web.client.RestTemplate: DEBUG
 
 jasypt:
   encryptor:
     algorithm: PBEWITHMD5ANDTRIPLEDES
     password: 123qweAS
+
+#springfox:
+#  documentation:
+#    open-api:
+#      v3:
+#        path: /api-docs
 
 feature:
   swift-messaging: true
