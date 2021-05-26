@@ -35,7 +35,7 @@
   
     <dependency>
       <groupId>tw.com.firstbank</groupId>
-      <artifactId>swift-messaging-api</artifactId>
+      <artifactId>common-api</artifactId>
       <version>1.0.0</version>
     </dependency>   
       

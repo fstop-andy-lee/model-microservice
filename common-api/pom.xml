@@ -10,9 +10,9 @@
       <relativePath>../parent-boot-2</relativePath>
   </parent>  
   
-  <artifactId>swift-messaging-api</artifactId>
+  <artifactId>common-api</artifactId>
   <version>1.0.0</version>
-  <name>swift-messaging-api</name>
+  <name>common-api</name>
   <packaging>jar</packaging>
   <url>https://www.firstbank.com.tw</url>
   
