@@ -24,7 +24,7 @@ public class SwaggerDocumentationConfig {
   private static final String PACKAGE = "tw.com.firstbank.adapter.controller";
   private static final String VERSION = "1.0.0";
   private static final String TITLE = "Swift Messaging API";
-  private static final String DESC = "This is a Swift Messaging API";
+  private static final String DESC = "This is a project for Swift Messaging API";
   private static final String CONTACT_EMAIL = "andy_lee@fstop.com.tw";
   private static final String CONTACT_NAME = "";
   private static final String CONTACT_URL = "";
