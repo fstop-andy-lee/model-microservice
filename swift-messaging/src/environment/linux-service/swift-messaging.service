@@ -1,0 +1,29 @@
+[Unit]
+Description=swift-messaging
+After=syslog.target
+
+[Service]
+User=api
+TimeoutStopSec=45s
+#WorkingDirectory=/opt/swift-messaging
+
+ExecStart=/usr/bin/java \
+    -cp "/opt/swift-messaging/conf:/opt/swift-messaging/lib/*" \
+    -Dspring.application.admin.enabled=false \
+    -Dfile.encoding=UTF8 \
+    -Djava.awt.headless=true \
+	-Djava.security.egd=file:/dev/urandom \
+    -Dlogger.file=/opt/swift-messaging/conf/logback.xml \
+	-Dloader.main=tw.com.firstbank.SwiftMessagingApp \
+	-Dspring.profiles.active=prod \
+    -Xms256m \
+    -Xmx1024m \
+    -XX:+HeapDumpOnOutOfMemoryError \
+    -XX:HeapDumpPath=/tmp \
+    org.springframework.boot.loader.PropertiesLauncher
+    
+
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target
