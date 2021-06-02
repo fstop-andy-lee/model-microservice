@@ -231,9 +231,11 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <configuration>
+          <!-- 
           <layers>
             <enabled>true</enabled>
           </layers>
+          -->
           <fork>true</fork>
           <!-- 無法用 unzip 解開, 為 shell script -->
           <!--  <executable>true</executable> -->
