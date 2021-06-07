@@ -21,6 +21,12 @@ public class SendMessagingController implements SendMessagingApi {
 
   private final HttpServletRequest request;
   
+  @GetMapping(value="/")
+  String index() {
+    log.debug("index");
+    return "ok";
+  }
+  
   @GetMapping(value="/test")
   void test() {
     log.debug("test");
