@@ -239,7 +239,7 @@
           <fork>true</fork>
           <!-- 無法用 unzip 解開, 為 shell script -->
           <!--  <executable>true</executable> -->
-          <mainClass>tw.com.firstbank.SwfitMessagingApp</mainClass>
+          <mainClass>tw.com.firstbank.SwiftMessagingApp</mainClass>
           <executable>false</executable>          
           <arguments>
             <argument>--spring.profiles.active=dev</argument>
