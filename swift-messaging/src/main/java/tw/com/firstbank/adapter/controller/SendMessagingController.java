@@ -1,5 +1,7 @@
 package tw.com.firstbank.adapter.controller;
 
+import java.util.Optional;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -22,9 +24,11 @@ public class SendMessagingController implements SendMessagingApi {
   private final HttpServletRequest request;
   
   @GetMapping(value="/")
-  String index() {
+  ResponseEntity<String> index() {
     log.debug("index");
-    return "ok";
+    return new ResponseEntity<>(
+        "OK", 
+        HttpStatus.OK);
   }
   
   @GetMapping(value="/test")
