@@ -10,6 +10,7 @@ pipeline {
     environment {
 	  DOCKERHUB_TOKEN = credentials('dockerhub-token')
 	  IMAGE_NAME = 'andylee1973/swift-messaging'
+	  CTS = sh(script:'date +%Y-%m-%dT%H:%M:00Z', returnStdout: true).trim()
 	  
 	}
     stages {
@@ -56,7 +57,11 @@ pipeline {
                 sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/v1.20.5/bin/linux/amd64/kubectl"'  
                 sh 'chmod u+x ./kubectl'  
                 sh './kubectl get pods'
-                sh './kubectl patch  deployment swift-messaging --patch \'{\"spec\":{\"template\": {\"metadata\": {\"creationTimestamp\": \"2021-06-07T09:39:33Z\" }}}}\' '
+                //sh './kubectl patch  deployment swift-messaging --patch \'{\"spec\":{\"template\": {\"metadata\": {\"creationTimestamp\": \"2021-06-16T10:11:12Z\" }}}}\' '
+                sh '''
+                  PT='{"spec":{"template":{"metadata":{"creationTimestamp":"'${CTS}'"}}}}'
+                  ./kubectl patch  deployment swift-messaging  -p ${PT}
+                '''
               }
                
            }
