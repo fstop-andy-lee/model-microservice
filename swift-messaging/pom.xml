@@ -182,7 +182,7 @@
       <version>2.0.0</version>
     </dependency>    
     	 
-    <!-- dev & test -->     
+    <!-- dev & test -->        
     <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
@@ -200,7 +200,7 @@
       <artifactId>spring-boot-devtools</artifactId>
       <optional>true</optional>
     </dependency>    	   
-     
+ 
   </dependencies>
   
   <build>
@@ -284,4 +284,5 @@
       
     </plugins>
   </build>  
+  
 </project>
