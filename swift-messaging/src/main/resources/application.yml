@@ -81,6 +81,19 @@ jasypt:
     algorithm: PBEWITHMD5ANDTRIPLEDES
     password: 123qweAS
 
+opentracing:
+  jaeger:
+    enabled: true
+    log-spans: true  
+    service-name: ${spring.application.name}
+    udp-sender:
+      host: localhost
+      port: 6831
+    #http-sender:
+    #  url: http://jaegerhost:portNumber/api/traces
+    const-sampler:
+      decision: true
+
 #springfox:
 #  documentation:
 #    open-api:

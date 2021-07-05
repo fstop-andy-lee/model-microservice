@@ -5,6 +5,7 @@ import javax.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -31,4 +32,6 @@ public interface SendMessagingApi {
       //@Parameter(in = ParameterIn.DEFAULT, description = "Swift Message to send", schema=@Schema())
       @ApiParam(value = "SwiftMessage", required = true)
       @Valid @RequestBody SwiftMessage body);
+  
+  
 }
