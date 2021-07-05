@@ -87,7 +87,7 @@ opentracing:
     log-spans: true  
     service-name: ${spring.application.name}
     udp-sender:
-      host: localhost
+      host: 10.106.220.158
       port: 6831
     #http-sender:
     #  url: http://jaegerhost:portNumber/api/traces
