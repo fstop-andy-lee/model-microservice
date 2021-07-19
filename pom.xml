@@ -198,5 +198,6 @@
     <module>common-module</module>
     <module>common-api</module>
     <module>swift-messaging</module>
+    <module>main-service</module>
   </modules>
 </project>
