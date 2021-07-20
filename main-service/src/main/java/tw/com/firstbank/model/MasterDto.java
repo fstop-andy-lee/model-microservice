@@ -1,6 +1,5 @@
 package tw.com.firstbank.model;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import lombok.Getter;
@@ -16,9 +15,9 @@ public class MasterDto {
 
   private String id;
   
-  private Integer holdMark;
+  private String holdMark;
   
-  private BigDecimal balance;
+  private String balance;
   
   private Integer status;
   
@@ -28,17 +27,8 @@ public class MasterDto {
   
   private Integer seq = 0;
   
+  private Integer cond;
+  
   private boolean compensate = false;
   
-  public void setBalance(BigDecimal amt) {
-    this.balance = amt;
-  }
-  
-  public void setBalance(Integer amt) {
-    this.balance = BigDecimal.valueOf(amt);
-  }
-
-  public void setBalance(Float amt) {
-    this.balance = BigDecimal.valueOf(amt);
-  }  
 }

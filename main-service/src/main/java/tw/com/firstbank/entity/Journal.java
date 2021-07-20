@@ -1,11 +1,11 @@
 package tw.com.firstbank.entity;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.IdClass;
 import javax.persistence.Table;
 
 import lombok.Getter;
@@ -14,21 +14,21 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "master")
+@Table(name = "journal")
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(of = {"id", "holdMark", "balance", "status", "cif"})
-public class Master implements Serializable {
-
-  private static final long serialVersionUID = -347185184625668388L;
+@ToString(of = {"id", "seq", "balance", "status"})
+@IdClass(JournalKey.class)
+public class Journal {
   
   @Id
   @Column(name = "id", nullable=false)
   private String id;
   
-  @Column(name = "hold_mark", nullable=true)
-  private String holdMark;
+  @Id
+  @Column(name = "seq", nullable=false)
+  private Integer seq;
   
   @Column(name = "balance", nullable=true)
   private BigDecimal balance;
@@ -36,9 +36,6 @@ public class Master implements Serializable {
   @Column(name = "status", nullable=true)
   private Integer status;
   
-  @Column(name = "cif", nullable=true)
-  private String cif;
-
   public void setBalance(BigDecimal amt) {
     this.balance = amt;
   }
@@ -50,12 +47,13 @@ public class Master implements Serializable {
   public void setBalance(Float amt) {
     this.balance = BigDecimal.valueOf(amt);
   }
-  
+
   @Override
   public int hashCode() {
     final int prime = 31;
     int result = 1;
     result = prime * result + ((id == null) ? 0 : id.hashCode());
+    result = prime * result + ((seq == null) ? 0 : seq.hashCode());
     return result;
   }
 
@@ -67,13 +65,18 @@ public class Master implements Serializable {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    Master other = (Master) obj;
+    Journal other = (Journal) obj;
     if (id == null) {
       if (other.id != null)
         return false;
     } else if (!id.equals(other.id))
       return false;
+    if (seq == null) {
+      if (other.seq != null)
+        return false;
+    } else if (!seq.equals(other.seq))
+      return false;
     return true;
   }
-
+  
 }

@@ -35,14 +35,14 @@ public class MasterServiceTest {
     
     MasterDto dto = new MasterDto();
     dto.setId(id);
-    dto.setBalance(amt);
+    dto.setBalance(amt.toString());
     dto.setStatus(status);
     
-    masterService.save(dto);
+    masterService.sagaUpdate(dto);
     
     Master m = masterRepo.findById(id).get();
     assertTrue(m.getStatus() == status && m.getBalance().intValue() == amt);
-    assertTrue(m.getHoldMark() == 0);
+    assertTrue(m.getHoldMark() == null);
   }
   
   @Test(expected = IllegalStateException.class)
@@ -54,11 +54,11 @@ public class MasterServiceTest {
     
     // and locked
     Master m = masterRepo.findById(id).get();
-    m.setHoldMark(1);
+    m.setHoldMark("1");
     masterRepo.save(m);
     
     // when
-    masterService.save(dto);
+    masterService.sagaUpdate(dto);
     
     // then
   }

@@ -34,11 +34,11 @@ public class MasterTest {
   @Test
   public void testSave() {
     Master m = masterRepo.findAll().get(0);
-    m.setHoldMark(1);
+    m.setHoldMark("1");
     masterRepo.save(m);
     
     Master e = new Master();
-    e.setHoldMark(1);
+    e.setHoldMark("1");
     Example<Master> example = Example.of(e);
     Optional<Master> opt = masterRepo.findOne(example);
     e = opt.get();

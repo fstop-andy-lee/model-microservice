@@ -1,7 +1,6 @@
 package tw.com.firstbank.entity;
 
 import java.io.Serializable;
-import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,15 +13,15 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
-@Table(name = "master")
+@Table(name = "temp")
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(of = {"id", "holdMark", "balance", "status", "cif"})
-public class Master implements Serializable {
+@ToString(of = {"id", "holdMark", "status"})
+public class Temp implements Serializable {
 
-  private static final long serialVersionUID = -347185184625668388L;
-  
+  private static final long serialVersionUID = -8293790680549904682L;
+
   @Id
   @Column(name = "id", nullable=false)
   private String id;
@@ -30,27 +29,9 @@ public class Master implements Serializable {
   @Column(name = "hold_mark", nullable=true)
   private String holdMark;
   
-  @Column(name = "balance", nullable=true)
-  private BigDecimal balance;
-  
   @Column(name = "status", nullable=true)
   private Integer status;
-  
-  @Column(name = "cif", nullable=true)
-  private String cif;
 
-  public void setBalance(BigDecimal amt) {
-    this.balance = amt;
-  }
-  
-  public void setBalance(Integer amt) {
-    this.balance = BigDecimal.valueOf(amt);
-  }
-
-  public void setBalance(Float amt) {
-    this.balance = BigDecimal.valueOf(amt);
-  }
-  
   @Override
   public int hashCode() {
     final int prime = 31;
@@ -67,7 +48,7 @@ public class Master implements Serializable {
       return false;
     if (getClass() != obj.getClass())
       return false;
-    Master other = (Master) obj;
+    Temp other = (Temp) obj;
     if (id == null) {
       if (other.id != null)
         return false;
@@ -75,5 +56,5 @@ public class Master implements Serializable {
       return false;
     return true;
   }
-
+  
 }
