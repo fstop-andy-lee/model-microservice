@@ -42,6 +42,7 @@ public class MasterServiceImpl implements MasterService {
   
   String updateMasterUrl = "http://localhost:8080/api/master";
   String updateTempUrl = "http://localhost:8080/api/temp";
+  String updateJournalUrl = "http://localhost:8080/api/journal";
   
   private final ObjectMapper objectMapper = new ObjectMapper();
   
