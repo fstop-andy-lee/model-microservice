@@ -1,5 +1,6 @@
 package tw.com.firstbank.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
@@ -40,6 +41,7 @@ public class MasterServiceImpl implements MasterService {
   ServiceLog0Repository log0Repo;
   
   String updateMasterUrl = "http://localhost:8080/api/master";
+  String updateTempUrl = "http://localhost:8080/api/temp";
   
   private final ObjectMapper objectMapper = new ObjectMapper();
   
@@ -66,13 +68,12 @@ public class MasterServiceImpl implements MasterService {
         String threadName = Thread.currentThread().getName();
         log.debug("Thread name: {}", threadName);
         // 呼叫 
+        updateTemp(dto);
         
-        //cdt.countDown();
-        try {
-          Thread.sleep(11 * 1000);
-        } catch (InterruptedException e) {          
-          e.printStackTrace();
-        }
+        cdt.countDown();
+        /*
+         * try { Thread.sleep(11 * 1000); } catch (InterruptedException e) { e.printStackTrace(); }
+         */
         
         return;
       });
@@ -130,19 +131,46 @@ public class MasterServiceImpl implements MasterService {
     }
   }
   
+  private void updateTemp(MasterDto dto) {
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    
+    String req = null;
+    try {
+      req = objectMapper.writeValueAsString(dto);
+    } catch (JsonProcessingException e) {
+      log.error("Convert json error ", e);
+      throw new IllegalStateException("Convert Fail"); 
+    }
+    log.debug("Req = {}", req);
+    HttpEntity<String> request = new HttpEntity<String>(req, headers);
+    
+    String rep = restTemplate.postForObject(updateTempUrl, request, String.class);
+    log.debug("Rep = {}", rep);
+    if ("OK".equalsIgnoreCase(rep) == false) {
+      throw new IllegalStateException("Update Fail");    
+    }
+  }
+  
   @Transactional(value = TxType.REQUIRES_NEW)
   public void checkAndLock(MasterDto dto) {
+    Master master = null;
     Optional<Master> opt = masterRepo.findById(dto.getId());
     if (!opt.isPresent()) {
-      throw new IllegalStateException("Not Found!");      
+      //throw new IllegalStateException("Not Found!"); 
+      master = new Master();
+      master.setId(dto.getId());
+    } else {
+      master = opt.get();
     }
-    if (StringUtils.hasText(opt.get().getHoldMark()) == true &&
-        opt.get().getHoldMark().equalsIgnoreCase(dto.getUuid()) == false
+        
+    if (StringUtils.hasText(master.getHoldMark()) == true &&
+        master.getHoldMark().equalsIgnoreCase(dto.getUuid()) == false
         ) {
       throw new IllegalStateException("Lock by Others!");            
     }
     
-    Master master = opt.get();
     master.setHoldMark(dto.getUuid());
     masterRepo.save(master);
     masterRepo.flush();
@@ -221,6 +249,16 @@ public class MasterServiceImpl implements MasterService {
     master.setStatus(dto.getStatus());
     masterRepo.save(master);
     masterRepo.flush();
+    
+    // log0
+    ServiceLog0 log0 = new ServiceLog0();
+    log0.setId(dto.getUuid());
+    log0.setSeq(dto.getSeq());
+    log0.setTs(LocalDateTime.now());
+    log0.setStatus(0);
+    log0Repo.save(log0);
+    log0Repo.flush();
+    
   }
   
   @Override
@@ -239,10 +277,17 @@ public class MasterServiceImpl implements MasterService {
     log.debug("Before Compensate master = {} ", master.toString());
    
     master.setBalance(master.getBalance().floatValue() - Float.valueOf(dto.getBalance()));
-    master.setStatus(0);
-    
+    master.setStatus(0);    
     masterRepo.save(master);
     masterRepo.flush();
+    
+    // log0
+    ServiceLog0 log0 = new ServiceLog0();
+    log0.setId(dto.getUuid());
+    log0.setSeq(dto.getSeq());
+    log0.setStatus(1);
+    log0Repo.save(log0);
+    log0Repo.flush();    
   }
   
   @Override
