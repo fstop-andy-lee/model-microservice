@@ -10,7 +10,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(of = {"id", "holdMark", "balance", "status", "cif"})
+@ToString(of = {"id", "holdMark", "balance", "status", "cif", "testCase"})
 public class MasterDto {
 
   private String id;
@@ -27,7 +27,7 @@ public class MasterDto {
   
   private Integer seq = 0;
   
-  private Integer cond;
+  private Integer testCase;
   
   private boolean compensate = false;
   

@@ -1,5 +1,6 @@
 package tw.com.firstbank.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -44,6 +46,7 @@ public class MasterServiceImpl implements MasterService {
   String updateTempUrl = "http://localhost:8080/api/temp";
   String updateJournalUrl = "http://localhost:8080/api/journal";
   
+  private Integer timeoutSeconds = 10;
   private final ObjectMapper objectMapper = new ObjectMapper();
   
   @Transactional
@@ -55,44 +58,39 @@ public class MasterServiceImpl implements MasterService {
       dto.setSeq(0);
       
       checkAndLock(dto);
+      
+      //Integer threadCount = 2;
+      //ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+      //CountDownLatch cdt = new CountDownLatch(threadCount);
 
       // 1
       dto.setSeq(1);
       save(dto);
+
+      // 2, 3
+      Boolean isFinished = sagaProcess(dto);
+
+      if (isFinished == false) {
+        log.debug("Saga Compensate");
+        dto.setCompensate(true);
+        this.compensateSave(dto);
+        sagaCompensateProcess(dto);
+      }
       
-      Integer threadCount = 1;
-      Integer timeoutSeconds = 5;
-      ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-      CountDownLatch cdt = new CountDownLatch(1);
-      
-      executor.submit(() -> {
-        String threadName = Thread.currentThread().getName();
-        log.debug("Thread name: {}", threadName);
-        // 呼叫 
-        updateTemp(dto);
-        
-        cdt.countDown();
-        /*
-         * try { Thread.sleep(11 * 1000); } catch (InterruptedException e) { e.printStackTrace(); }
-         */
-        
-        return;
-      });
-      
+      /*
+      Boolean finished = false;
       try {
-        Boolean finished = cdt.await(timeoutSeconds, TimeUnit.SECONDS);
+        finished = cdt.await(timeoutSeconds, TimeUnit.SECONDS);
         if (finished) {
-          log.debug("CountDownLatch finished");    
+          log.debug("Saga process finished");    
         } else {
-          // 補償
-          log.debug("CountDownLatch timeout");  
-          this.compensateSave(dto);
+          log.debug("Saga process timeout");  
         }
-        
         executor.shutdown();
         log.debug("Executor shutdown");
         executor.awaitTermination(timeoutSeconds, TimeUnit.SECONDS);
         log.debug("Executor termination");
+        
       } catch (InterruptedException e) {
         log.error("tasks interrupted");
       } finally {
@@ -102,14 +100,89 @@ public class MasterServiceImpl implements MasterService {
         executor.shutdownNow();
         log.debug("shutdown finished");
       }
-
+      */
       
     } finally {
+      log.debug("Unlock");
       unLock(dto);      
     }
     
   }
- 
+  
+  private Boolean sagaProcess(MasterDto dto) {    
+    Integer threadCount = 2;
+    ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+    CountDownLatch cdt = new CountDownLatch(threadCount);
+    
+    // 2
+    MasterDto dto2 = new MasterDto();
+    BeanUtils.copyProperties(dto, dto2);      
+    dto2.setSeq(2);      
+    executor.submit(() -> {
+      String threadName = Thread.currentThread().getName();
+      log.debug("Thread name: {}", threadName);
+      // 呼叫 
+      updateTemp(dto2);      
+      cdt.countDown();
+      /*
+       * try { Thread.sleep(11 * 1000); } catch (InterruptedException e) { e.printStackTrace(); }
+       */
+      
+      return;
+    });
+    
+    // 3
+    MasterDto dto3 = new MasterDto();
+    BeanUtils.copyProperties(dto, dto3);      
+    dto3.setSeq(3);      
+    executor.submit(() -> {
+      String threadName = Thread.currentThread().getName();
+      log.debug("Thread name: {}", threadName);
+      // 呼叫 
+      updateJournal(dto3);
+      if (dto3.isCompensate() == false) {
+        if (dto3.getTestCase() == 2) {
+          log.debug("Test case 2: journal timeout");
+          try { Thread.sleep((timeoutSeconds + 3) * 1000); } catch (InterruptedException e) { e.printStackTrace(); }          
+        } else if (dto3.getTestCase() == 1) {
+          log.debug("Test case 1: journal hold");
+          try { Thread.sleep((timeoutSeconds / 2) * 1000); } catch (InterruptedException e) { e.printStackTrace(); }        
+        }
+      }
+      cdt.countDown();      
+      return;
+    });
+    
+    Boolean isFinished = false;
+    try {
+      isFinished = cdt.await(timeoutSeconds, TimeUnit.SECONDS);
+      if (isFinished) {
+        log.debug("Saga process finished");    
+      } else {
+        log.debug("Saga process timeout");  
+      }
+      executor.shutdown();
+      log.debug("Executor shutdown");
+      executor.awaitTermination(timeoutSeconds, TimeUnit.SECONDS);
+      log.debug("Executor termination");
+      
+    } catch (InterruptedException e) {
+      log.error("tasks interrupted");
+    } finally {
+      if (!executor.isTerminated()) {
+        log.error("cancel non-finished tasks");
+      }
+      executor.shutdownNow();
+      log.debug("shutdown finished");
+    }
+    return isFinished;
+  }
+  
+  private void sagaCompensateProcess(MasterDto dto) {
+    this.sagaProcess(dto);    
+  }
+  
+  @SuppressWarnings("unused")
   private void updateMaster(MasterDto dto) {
     RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
@@ -144,11 +217,33 @@ public class MasterServiceImpl implements MasterService {
       log.error("Convert json error ", e);
       throw new IllegalStateException("Convert Fail"); 
     }
-    log.debug("Req = {}", req);
+    log.debug("Temp Req = {}", req);
     HttpEntity<String> request = new HttpEntity<String>(req, headers);
     
     String rep = restTemplate.postForObject(updateTempUrl, request, String.class);
-    log.debug("Rep = {}", rep);
+    log.debug("Temp Rep = {}", rep);
+    if ("OK".equalsIgnoreCase(rep) == false) {
+      throw new IllegalStateException("Update Fail");    
+    }
+  }
+  
+  private void updateJournal(MasterDto dto) {
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    
+    String req = null;
+    try {
+      req = objectMapper.writeValueAsString(dto);
+    } catch (JsonProcessingException e) {
+      log.error("Convert json error ", e);
+      throw new IllegalStateException("Convert Fail"); 
+    }
+    log.debug("Journal Req = {}", req);
+    HttpEntity<String> request = new HttpEntity<String>(req, headers);
+    
+    String rep = restTemplate.postForObject(updateJournalUrl, request, String.class);
+    log.debug("Journal Rep = {}", rep);
     if ("OK".equalsIgnoreCase(rep) == false) {
       throw new IllegalStateException("Update Fail");    
     }
@@ -233,8 +328,8 @@ public class MasterServiceImpl implements MasterService {
   @Override
   @Transactional
   public void save(MasterDto dto) {
-
     if (needExecute(dto) == false) {
+      log.debug("save no need execute");
       return;
     }
     
@@ -246,7 +341,7 @@ public class MasterServiceImpl implements MasterService {
     Master master = opt.get();
     log.debug("Before save master = {}", master.toString());
    
-    master.setBalance(Float.valueOf(dto.getBalance()));
+    master.setBalance(master.getBalance().add(BigDecimal.valueOf(Float.valueOf(dto.getBalance()))));
     master.setStatus(dto.getStatus());
     masterRepo.save(master);
     masterRepo.flush();
@@ -266,6 +361,7 @@ public class MasterServiceImpl implements MasterService {
   @Transactional
   public void compensateSave(MasterDto dto) {
     if (needExecute(dto) == false) {
+      log.debug("Compensate no need execute");
       return;
     }
     
@@ -283,9 +379,7 @@ public class MasterServiceImpl implements MasterService {
     masterRepo.flush();
     
     // log0
-    ServiceLog0 log0 = new ServiceLog0();
-    log0.setId(dto.getUuid());
-    log0.setSeq(dto.getSeq());
+    ServiceLog0 log0 = getLog0(dto.getUuid(), dto.getSeq()).get();
     log0.setStatus(1);
     log0Repo.save(log0);
     log0Repo.flush();    

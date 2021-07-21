@@ -24,7 +24,7 @@ public class MasterController implements MasterApi {
   
   @Override
   public ResponseEntity<String> saveMaster(@Valid MasterDto body) {
-    log.debug("master");
+    log.debug("master input = {}", body.toString());
     String rep = "OK";
     try {
       masterService.save(body);      
@@ -37,7 +37,7 @@ public class MasterController implements MasterApi {
   }
 
   @Override
-  public ResponseEntity<String> doSaga() {
+  public ResponseEntity<String> doSaga(Integer testCase) {
     String rep = "OK";
     log.debug("saga");
     try {
@@ -49,7 +49,9 @@ public class MasterController implements MasterApi {
       dto.setId(id);
       dto.setBalance(amt.toString());
       dto.setStatus(status);
+      dto.setTestCase(testCase);
       
+      log.debug("saga input = {}", dto.toString());
       masterService.sagaUpdate(dto);
           
     } catch(Exception e) {

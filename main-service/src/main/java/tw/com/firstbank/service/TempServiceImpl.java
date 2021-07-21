@@ -72,6 +72,7 @@ public class TempServiceImpl implements TempService {
   @Transactional
   public void compensateSave(MasterDto dto) {
     if (needExecute(dto) == false) {
+      log.debug("Compensate no need execute");
       return;
     }
     
@@ -88,10 +89,7 @@ public class TempServiceImpl implements TempService {
     tempRepo.flush(); 
     
     // log1
-    ServiceLog1 log1 = new ServiceLog1();
-    log1.setId(dto.getUuid());
-    log1.setSeq(dto.getSeq());
-    log1.setTs(LocalDateTime.now());
+    ServiceLog1 log1 = getLog1(dto.getUuid(), dto.getSeq()).get();
     log1.setStatus(1);
     log1Repo.save(log1);
     log1Repo.flush();        
@@ -101,6 +99,7 @@ public class TempServiceImpl implements TempService {
   @Transactional
   public void save(MasterDto dto) {
     if (needExecute(dto) == false) {
+      log.debug("save no need execute");
       return;
     }
     
@@ -165,7 +164,7 @@ public class TempServiceImpl implements TempService {
       temp.setHoldMark(null);
       tempRepo.save(temp);
       tempRepo.flush();
-      log.debug("Unlock result master = {}", temp.toString());
+      log.debug("Unlock result temp = {}", temp.toString());
     }        
   }
 

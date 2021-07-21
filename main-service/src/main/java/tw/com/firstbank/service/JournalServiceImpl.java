@@ -134,9 +134,7 @@ public class JournalServiceImpl implements JournalService {
     // 如果 journal 不在就不處理
     
     // log2
-    ServiceLog2 log2 = new ServiceLog2();
-    log2.setId(dto.getUuid());
-    log2.setSeq(dto.getSeq());
+    ServiceLog2 log2 = getLog2(dto.getUuid(), dto.getSeq()).get();
     log2.setStatus(1);
     log2Repo.save(log2);
     log2Repo.flush();    

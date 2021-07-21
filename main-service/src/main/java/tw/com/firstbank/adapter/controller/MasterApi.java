@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -37,7 +38,9 @@ public interface MasterApi {
       @ApiResponse(code = 400, message = "invalid input, object invalid"),
       @ApiResponse(code = 409, message = "already exists")})
   @RequestMapping(value = "/api/saga", method = RequestMethod.GET)
-  ResponseEntity<String> doSaga();
+  ResponseEntity<String> doSaga(
+      @ApiParam(value = "testCase", required = false)
+      @RequestParam(name = "testCase", required = false, defaultValue="0") Integer testCase);
   
   
 }
