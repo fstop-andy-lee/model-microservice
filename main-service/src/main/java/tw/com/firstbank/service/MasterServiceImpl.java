@@ -95,10 +95,7 @@ public class MasterServiceImpl implements MasterService {
       // 呼叫 
       updateTemp(dto2);      
       cdt.countDown();
-      /*
-       * try { Thread.sleep(11 * 1000); } catch (InterruptedException e) { e.printStackTrace(); }
-       */
-      
+       
       return;
     });
     
