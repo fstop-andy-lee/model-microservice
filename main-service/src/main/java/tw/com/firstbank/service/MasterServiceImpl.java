@@ -58,10 +58,6 @@ public class MasterServiceImpl implements MasterService {
       dto.setSeq(0);
       
       checkAndLock(dto);
-      
-      //Integer threadCount = 2;
-      //ExecutorService executor = Executors.newFixedThreadPool(threadCount);
-      //CountDownLatch cdt = new CountDownLatch(threadCount);
 
       // 1
       dto.setSeq(1);
@@ -76,31 +72,6 @@ public class MasterServiceImpl implements MasterService {
         this.compensateSave(dto);
         sagaCompensateProcess(dto);
       }
-      
-      /*
-      Boolean finished = false;
-      try {
-        finished = cdt.await(timeoutSeconds, TimeUnit.SECONDS);
-        if (finished) {
-          log.debug("Saga process finished");    
-        } else {
-          log.debug("Saga process timeout");  
-        }
-        executor.shutdown();
-        log.debug("Executor shutdown");
-        executor.awaitTermination(timeoutSeconds, TimeUnit.SECONDS);
-        log.debug("Executor termination");
-        
-      } catch (InterruptedException e) {
-        log.error("tasks interrupted");
-      } finally {
-        if (!executor.isTerminated()) {
-          log.error("cancel non-finished tasks");
-        }
-        executor.shutdownNow();
-        log.debug("shutdown finished");
-      }
-      */
       
     } finally {
       log.debug("Unlock");
@@ -140,6 +111,7 @@ public class MasterServiceImpl implements MasterService {
       log.debug("Thread name: {}", threadName);
       // 呼叫 
       updateJournal(dto3);
+      // for test
       if (dto3.isCompensate() == false) {
         if (dto3.getTestCase() == 2) {
           log.debug("Test case 2: journal timeout");
@@ -149,6 +121,7 @@ public class MasterServiceImpl implements MasterService {
           try { Thread.sleep((timeoutSeconds / 2) * 1000); } catch (InterruptedException e) { e.printStackTrace(); }        
         }
       }
+      // --
       cdt.countDown();      
       return;
     });
