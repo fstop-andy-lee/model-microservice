@@ -16,4 +16,5 @@ public interface MasterService {
   public void save(MasterDto dto);  
   public List<MasterDto> findAll();
   
+  public void sendTestMsg(String msg);
 }

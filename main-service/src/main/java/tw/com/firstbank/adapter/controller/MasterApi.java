@@ -42,5 +42,13 @@ public interface MasterApi {
       @ApiParam(value = "testCase", required = false)
       @RequestParam(name = "testCase", required = false, defaultValue="0") Integer testCase);
   
-  
+  @ApiOperation(value="send test mq message", notes="send test mq message")
+  @ApiResponses(value = {
+      @ApiResponse(code = 201, message  = "message sent"),
+      @ApiResponse(code = 400, message = "invalid input, object invalid"),
+      @ApiResponse(code = 409, message = "already exists")})
+  @RequestMapping(value = "/api/mq", method = RequestMethod.GET)
+  ResponseEntity<String> testMq(
+      @ApiParam(value = "msg", required = false)
+      @RequestParam(name = "msg", required = false, defaultValue="this is a test") String msg);
 }

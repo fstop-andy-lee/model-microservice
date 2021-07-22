@@ -6,6 +6,8 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -28,6 +30,9 @@ public class TempServiceImpl implements TempService {
   
   @Autowired
   ServiceLog1Repository log1Repo;
+  
+  @Autowired
+  RabbitTemplate rabbitTemplate;
   
   private Optional<ServiceLog1> getLog1(String id, Integer seq) {
     ServiceLogKey key = new ServiceLogKey(id, seq);
@@ -180,6 +185,30 @@ public class TempServiceImpl implements TempService {
       } else {
         this.save(dto);
       }
+      
+    } finally {
+      unLock(dto);      
+    }    
+  }
+  
+  private void sendSagaEvent(String queueName, MasterDto dto) {
+    rabbitTemplate.setChannelTransacted(true);
+    rabbitTemplate.convertAndSend(queueName, dto);    
+  }
+  
+  @Transactional
+  @RabbitListener(queues = "tempQueue")  
+  public void sagaUpdateByEvent(MasterDto dto) {
+    try {
+      checkAndLock(dto);
+      
+      if (dto.isCompensate()) {
+        this.compensateSave(dto);
+      } else {
+        this.save(dto);
+      }
+      
+      sendSagaEvent("orchQueue", dto);
       
     } finally {
       unLock(dto);      

@@ -60,6 +60,31 @@ spring:
     initializer:
       enabled: false
 
+  # RabbitMQ properties
+  rabbitmq:
+   addresses: localhost:5672
+   adminAddresses: http://localhost:15672
+   nodes: rabbit@localhost
+   username: guest
+   password: guest
+   virtual-host: /
+   useSSL: false
+   sslProperties:
+   ssl:
+     keyStore:
+     keyStorePassphrase:
+     trustStore:
+     trustStorePassphrase:
+   channelCacheSize: 100
+   listener:
+     simple:
+       default-requeue-rejected: false
+       retry:
+         enabled: true
+       # auto, manual
+       acknowledge-mode: auto
+
+
 security:
   basic:
     enabled: false

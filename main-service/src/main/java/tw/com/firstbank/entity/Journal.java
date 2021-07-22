@@ -1,5 +1,6 @@
 package tw.com.firstbank.entity;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 import javax.persistence.Column;
@@ -20,8 +21,10 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(of = {"id", "seq", "balance", "status"})
 @IdClass(JournalKey.class)
-public class Journal {
+public class Journal implements Serializable {
   
+  private static final long serialVersionUID = 8005304526966513138L;
+
   @Id
   @Column(name = "id", nullable=false)
   private String id;

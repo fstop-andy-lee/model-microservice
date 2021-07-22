@@ -1,5 +1,6 @@
 package tw.com.firstbank.model;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 import lombok.Getter;
@@ -11,7 +12,9 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString(of = {"id", "holdMark", "balance", "status", "cif", "testCase"})
-public class MasterDto {
+public class MasterDto implements Serializable {
+
+  private static final long serialVersionUID = 3648523261268781918L;
 
   private String id;
   

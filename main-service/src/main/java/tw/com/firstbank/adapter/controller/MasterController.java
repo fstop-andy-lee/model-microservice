@@ -62,4 +62,17 @@ public class MasterController implements MasterApi {
         HttpStatus.OK);
   }
 
+  @Override
+  public ResponseEntity<String> testMq(String msg) {
+    String rep = "OK";
+    try {
+      masterService.sendTestMsg(msg);      
+    } catch(Exception e) {
+      rep = e.getMessage();
+    }
+    return new ResponseEntity<>(
+        rep, 
+        HttpStatus.OK);
+  }
+
 }

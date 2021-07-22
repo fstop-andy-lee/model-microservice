@@ -12,6 +12,9 @@ import java.util.concurrent.TimeUnit;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -25,6 +28,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
+import tw.com.firstbank.adapter.channel.TestChannel;
 import tw.com.firstbank.entity.Master;
 import tw.com.firstbank.entity.ServiceLog0;
 import tw.com.firstbank.entity.ServiceLogKey;
@@ -41,6 +45,9 @@ public class MasterServiceImpl implements MasterService {
   
   @Autowired
   ServiceLog0Repository log0Repo;
+  
+  @Autowired
+  RabbitTemplate rabbitTemplate;
   
   String updateMasterUrl = "http://localhost:8080/api/master";
   String updateTempUrl = "http://localhost:8080/api/temp";
@@ -358,6 +365,92 @@ public class MasterServiceImpl implements MasterService {
   @Override
   public List<MasterDto> findAll() {
     return null;
+  }
+
+  //------------------------------------------------
+  Integer serviceCount = 2;
+  CountDownLatch eventCdt = new CountDownLatch(serviceCount);
+  
+  @Override
+  public void sendTestMsg(String msg) {
+    rabbitTemplate.setChannelTransacted(true);
+    MasterDto dto = new MasterDto();
+    // only supports String, byte[] and Serializable payloads
+    dto.setId(msg);
+    rabbitTemplate.convertAndSend("testQueue", dto);    
+  }
+
+  @RabbitListener(queues = "orchQueue")  
+  public void listenOrchEvent(MasterDto dto) {
+    log.debug("Receive Event = {}", dto.toString());
+    eventCdt.countDown();
+  }
+  
+  @Transactional
+  public void sagaUpdateByEvent(MasterDto dto) {
+    try {
+      // init hold mark
+      dto.setHoldMark(dto.getUuid());
+      dto.setSeq(0);
+      
+      checkAndLock(dto);
+
+      // 1
+      dto.setSeq(1);
+      save(dto);
+
+      eventCdt = new CountDownLatch(serviceCount);
+      // 2, 3
+      Boolean isFinished = sagaProcessByEvent(dto);
+
+      if (isFinished == false) {
+        log.debug("Saga Compensate By Event");
+        dto.setCompensate(true);
+        this.compensateSave(dto);
+        sagaCompensateProcessByEvent(dto);
+      }
+      
+    } finally {
+      log.debug("Unlock");
+      unLock(dto);      
+    }
+  }
+  
+  private void sendSagaEvent(String queueName, MasterDto dto) {
+    rabbitTemplate.setChannelTransacted(true);
+    rabbitTemplate.convertAndSend(queueName, dto);    
+  }
+  
+  private void sagaCompensateProcessByEvent(MasterDto dto) {
+    this.sagaProcessByEvent(dto);    
+  }
+  
+  public Boolean sagaProcessByEvent(MasterDto dto) {
+    // 2
+    MasterDto dto2 = new MasterDto();
+    BeanUtils.copyProperties(dto, dto2);      
+    dto2.setSeq(2);      
+    sendSagaEvent("tempQueue", dto2);
+    
+    // 3
+    MasterDto dto3 = new MasterDto();
+    BeanUtils.copyProperties(dto, dto3);      
+    dto3.setSeq(3);      
+    sendSagaEvent("journalQueue", dto3);
+    
+    Boolean isFinished = false;
+    try {
+      isFinished = eventCdt.await(timeoutSeconds, TimeUnit.SECONDS);
+      if (isFinished) {
+        log.debug("Saga process finished");    
+      } else {
+        log.debug("Saga process timeout");  
+      }      
+    } catch (Exception e) {
+      log.error(e.getMessage(), e);
+    } finally {
+    }
+    return isFinished;
   }
   
 }
