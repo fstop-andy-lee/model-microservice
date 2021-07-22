@@ -12,7 +12,6 @@ import java.util.concurrent.TimeUnit;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
-import org.springframework.amqp.core.Message;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
@@ -28,7 +27,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
-import tw.com.firstbank.adapter.channel.TestChannel;
 import tw.com.firstbank.entity.Master;
 import tw.com.firstbank.entity.ServiceLog0;
 import tw.com.firstbank.entity.ServiceLogKey;
