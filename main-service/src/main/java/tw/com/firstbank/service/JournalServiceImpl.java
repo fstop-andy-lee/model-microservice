@@ -6,6 +6,8 @@ import java.util.Optional;
 import javax.transaction.Transactional;
 import javax.transaction.Transactional.TxType;
 
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,9 @@ public class JournalServiceImpl implements JournalService {
   
   @Autowired
   ServiceLog2Repository log2Repo;
+  
+  @Autowired
+  RabbitTemplate rabbitTemplate;
   
   private Optional<ServiceLog2> getLog2(String id, Integer seq) {
     ServiceLogKey key = new ServiceLogKey(id, seq);
@@ -167,5 +172,28 @@ public class JournalServiceImpl implements JournalService {
     log2Repo.flush();    
     
   }
+  
+  private void sendSagaEvent(String queueName, MasterDto dto) {
+    rabbitTemplate.setChannelTransacted(true);
+    rabbitTemplate.convertAndSend(queueName, dto);    
+  }
+  
+  @Transactional
+  @RabbitListener(queues = "journalQueue")  
+  public void sagaUpdateByEvent(MasterDto dto) {
+    
+    try {
+      checkAndLock(dto);
 
+      if (dto.isCompensate()) {
+        this.compensateSave(dto);
+      } else {
+        this.save(dto);
+      }
+      sendSagaEvent("orchQueue", dto);
+    } finally {
+      unLock(dto);
+    }
+    
+  }
 }
