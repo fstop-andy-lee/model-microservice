@@ -63,6 +63,32 @@ public class MasterController implements MasterApi {
   }
 
   @Override
+  public ResponseEntity<String> doEventSaga(Integer testCase) {
+    String rep = "OK";
+    log.debug("saga");
+    try {
+      String id = "10-110-1234";
+      Integer amt = 100;
+      Integer status = 1;
+      
+      MasterDto dto = new MasterDto();
+      dto.setId(id);
+      dto.setBalance(amt.toString());
+      dto.setStatus(status);
+      dto.setTestCase(testCase);
+      
+      log.debug("saga input = {}", dto.toString());
+      masterService.sagaUpdateByEvent(dto);
+          
+    } catch(Exception e) {
+      rep = e.getMessage();
+    }    
+    return new ResponseEntity<>(
+        rep, 
+        HttpStatus.OK);
+  }
+  
+  @Override
   public ResponseEntity<String> testMq(String msg) {
     String rep = "OK";
     try {

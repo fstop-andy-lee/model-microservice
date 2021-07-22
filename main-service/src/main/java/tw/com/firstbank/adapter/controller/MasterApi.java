@@ -42,6 +42,16 @@ public interface MasterApi {
       @ApiParam(value = "testCase", required = false)
       @RequestParam(name = "testCase", required = false, defaultValue="0") Integer testCase);
   
+  @ApiOperation(value="do saga api", notes="do saga api")
+  @ApiResponses(value = {
+      @ApiResponse(code = 201, message  = "message sent"),
+      @ApiResponse(code = 400, message = "invalid input, object invalid"),
+      @ApiResponse(code = 409, message = "already exists")})
+  @RequestMapping(value = "/api/event", method = RequestMethod.GET)
+  ResponseEntity<String> doEventSaga(
+      @ApiParam(value = "testCase", required = false)
+      @RequestParam(name = "testCase", required = false, defaultValue="0") Integer testCase);
+  
   @ApiOperation(value="send test mq message", notes="send test mq message")
   @ApiResponses(value = {
       @ApiResponse(code = 201, message  = "message sent"),

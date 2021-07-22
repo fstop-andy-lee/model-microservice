@@ -7,6 +7,7 @@ import tw.com.firstbank.model.MasterDto;
 public interface MasterService {
 
   public void sagaUpdate(MasterDto dto);  
+  public void sagaUpdateByEvent(MasterDto dto);
   public boolean logExist(MasterDto dto);
   public boolean compensateComplete(MasterDto dto);
   public boolean allowCompensate(MasterDto dto);

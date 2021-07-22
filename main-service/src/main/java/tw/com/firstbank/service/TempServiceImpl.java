@@ -192,7 +192,7 @@ public class TempServiceImpl implements TempService {
   }
   
   private void sendSagaEvent(String queueName, MasterDto dto) {
-    rabbitTemplate.setChannelTransacted(true);
+    //rabbitTemplate.setChannelTransacted(true);
     rabbitTemplate.convertAndSend(queueName, dto);    
   }
   
@@ -200,6 +200,7 @@ public class TempServiceImpl implements TempService {
   @RabbitListener(queues = "tempQueue")  
   public void sagaUpdateByEvent(MasterDto dto) {
     try {
+      log.debug("Temp Queue input = {}", dto.toString());
       checkAndLock(dto);
       
       if (dto.isCompensate()) {
@@ -207,7 +208,7 @@ public class TempServiceImpl implements TempService {
       } else {
         this.save(dto);
       }
-      
+      log.debug("Temp Rep to Orch Queue");
       sendSagaEvent("orchQueue", dto);
       
     } finally {

@@ -369,7 +369,7 @@ public class MasterServiceImpl implements MasterService {
 
   //------------------------------------------------
   Integer serviceCount = 2;
-  CountDownLatch eventCdt = new CountDownLatch(serviceCount);
+  CountDownLatch eventCdt = null;
   
   @Override
   public void sendTestMsg(String msg) {
@@ -386,6 +386,7 @@ public class MasterServiceImpl implements MasterService {
     eventCdt.countDown();
   }
   
+  @Override
   @Transactional
   public void sagaUpdateByEvent(MasterDto dto) {
     try {
@@ -417,7 +418,7 @@ public class MasterServiceImpl implements MasterService {
   }
   
   private void sendSagaEvent(String queueName, MasterDto dto) {
-    rabbitTemplate.setChannelTransacted(true);
+    //rabbitTemplate.setChannelTransacted(true);
     rabbitTemplate.convertAndSend(queueName, dto);    
   }
   
@@ -442,9 +443,9 @@ public class MasterServiceImpl implements MasterService {
     try {
       isFinished = eventCdt.await(timeoutSeconds, TimeUnit.SECONDS);
       if (isFinished) {
-        log.debug("Saga process finished");    
+        log.debug("Saga event process finished");    
       } else {
-        log.debug("Saga process timeout");  
+        log.debug("Saga event process timeout");  
       }      
     } catch (Exception e) {
       log.error(e.getMessage(), e);

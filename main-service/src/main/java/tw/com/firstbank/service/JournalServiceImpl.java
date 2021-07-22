@@ -174,15 +174,15 @@ public class JournalServiceImpl implements JournalService {
   }
   
   private void sendSagaEvent(String queueName, MasterDto dto) {
-    rabbitTemplate.setChannelTransacted(true);
+    //rabbitTemplate.setChannelTransacted(true);
     rabbitTemplate.convertAndSend(queueName, dto);    
   }
   
   @Transactional
   @RabbitListener(queues = "journalQueue")  
-  public void sagaUpdateByEvent(MasterDto dto) {
-    
+  public void sagaUpdateByEvent(MasterDto dto) {    
     try {
+      log.debug("Journal Queue input = {}", dto.toString());
       checkAndLock(dto);
 
       if (dto.isCompensate()) {
@@ -190,6 +190,19 @@ public class JournalServiceImpl implements JournalService {
       } else {
         this.save(dto);
       }
+      
+      // for test
+      if (dto.isCompensate() == false) {
+        if (dto.getTestCase() == 2) {
+          log.debug("Test case 2: journal timeout");
+          try { Thread.sleep(13 * 1000); } catch (InterruptedException e) { e.printStackTrace(); }          
+        } else if (dto.getTestCase() == 1) {
+          log.debug("Test case 1: journal hold");
+          try { Thread.sleep(5 * 1000); } catch (InterruptedException e) { e.printStackTrace(); }        
+        }
+      }
+      
+      log.debug("Journal Rep to Orch Queue");
       sendSagaEvent("orchQueue", dto);
     } finally {
       unLock(dto);
