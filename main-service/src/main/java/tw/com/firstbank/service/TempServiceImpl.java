@@ -191,6 +191,7 @@ public class TempServiceImpl implements TempService {
     }    
   }
   
+  @SuppressWarnings("unused")
   private void sendSagaEvent(String queueName, MasterDto dto) {
     //rabbitTemplate.setChannelTransacted(true);
     rabbitTemplate.convertAndSend(queueName, dto);    
@@ -198,18 +199,20 @@ public class TempServiceImpl implements TempService {
   
   @Transactional
   @RabbitListener(queues = "tempQueue")  
-  public void sagaUpdateByEvent(MasterDto dto) {
+  public MasterDto sagaUpdateByEvent(MasterDto dto) {
     try {
       log.debug("Temp Queue input = {}", dto.toString());
       checkAndLock(dto);
       
       if (dto.isCompensate()) {
+        log.debug("Temp Compensate");
         this.compensateSave(dto);
       } else {
         this.save(dto);
       }
       log.debug("Temp Rep to Orch Queue");
-      sendSagaEvent("orchQueue", dto);
+      //sendSagaEvent("orchQueue", dto);
+      return dto;
       
     } finally {
       unLock(dto);      

@@ -397,8 +397,7 @@ public class MasterServiceImpl implements MasterService {
       // 1
       dto.setSeq(1);
       save(dto);
-
-      eventCdt = new CountDownLatch(serviceCount);
+      
       // 2, 3
       Boolean isFinished = sagaProcessByEvent(dto);
 
@@ -415,6 +414,7 @@ public class MasterServiceImpl implements MasterService {
     }
   }
   
+  @SuppressWarnings("unused")
   private void sendSagaEvent(String queueName, MasterDto dto) {
     //rabbitTemplate.setChannelTransacted(true);
     rabbitTemplate.convertAndSend(queueName, dto);    
@@ -425,17 +425,46 @@ public class MasterServiceImpl implements MasterService {
   }
   
   public Boolean sagaProcessByEvent(MasterDto dto) {
+    ExecutorService executor = Executors.newFixedThreadPool(serviceCount);
+    eventCdt = new CountDownLatch(serviceCount);
+    
     // 2
     MasterDto dto2 = new MasterDto();
     BeanUtils.copyProperties(dto, dto2);      
     dto2.setSeq(2);      
-    sendSagaEvent("tempQueue", dto2);
+    //sendSagaEvent("tempQueue", dto2);
+    executor.submit(() -> {
+      String threadName = Thread.currentThread().getName();
+      log.debug("Thread name: {}", threadName);
+      // 呼叫 
+      Object obj = rabbitTemplate.convertSendAndReceive("tempQueue", dto2);    
+      if (obj == null) {
+        return;        
+      }
+      MasterDto rep = (MasterDto) obj; 
+      log.debug("Temp {} receive {}", threadName, rep.toString());
+      eventCdt.countDown();       
+      return;
+    });
     
     // 3
     MasterDto dto3 = new MasterDto();
     BeanUtils.copyProperties(dto, dto3);      
     dto3.setSeq(3);      
-    sendSagaEvent("journalQueue", dto3);
+    //sendSagaEvent("journalQueue", dto3);
+    executor.submit(() -> {
+      String threadName = Thread.currentThread().getName();
+      log.debug("Thread name: {}", threadName);
+      // 呼叫 
+      Object obj = rabbitTemplate.convertSendAndReceive("journalQueue", dto3); 
+      if (obj == null) {
+        return;        
+      }
+      MasterDto rep = (MasterDto) obj;      
+      log.debug("Journal {} receive {}", threadName, rep.toString());
+      eventCdt.countDown();       
+      return;
+    });
     
     Boolean isFinished = false;
     try {
@@ -445,9 +474,20 @@ public class MasterServiceImpl implements MasterService {
       } else {
         log.debug("Saga event process timeout");  
       }      
+      
+      executor.shutdown();
+      log.debug("Executor shutdown");
+      executor.awaitTermination(timeoutSeconds, TimeUnit.SECONDS);
+      log.debug("Executor termination");
+      
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     } finally {
+      if (!executor.isTerminated()) {
+        log.error("cancel non-finished tasks");
+      }
+      executor.shutdownNow();
+      log.debug("shutdown finished");
     }
     return isFinished;
   }

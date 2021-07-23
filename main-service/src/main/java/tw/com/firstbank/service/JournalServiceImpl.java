@@ -126,6 +126,7 @@ public class JournalServiceImpl implements JournalService {
   @Override
   public void compensateSave(MasterDto dto) {
     if (needExecute(dto) == false) {
+      log.debug("No need execute");
       return;
     }
     
@@ -148,6 +149,7 @@ public class JournalServiceImpl implements JournalService {
   @Override
   public void save(MasterDto dto) {
     if (needExecute(dto) == false) {
+      log.debug("No need execute");
       return;
     }
     
@@ -173,6 +175,7 @@ public class JournalServiceImpl implements JournalService {
     
   }
   
+  @SuppressWarnings("unused")
   private void sendSagaEvent(String queueName, MasterDto dto) {
     //rabbitTemplate.setChannelTransacted(true);
     rabbitTemplate.convertAndSend(queueName, dto);    
@@ -180,30 +183,34 @@ public class JournalServiceImpl implements JournalService {
   
   @Transactional
   @RabbitListener(queues = "journalQueue")  
-  public void sagaUpdateByEvent(MasterDto dto) {    
+  public MasterDto sagaUpdateByEvent(MasterDto dto) {    
     try {
       log.debug("Journal Queue input = {}", dto.toString());
       checkAndLock(dto);
 
-      if (dto.isCompensate()) {
-        this.compensateSave(dto);
-      } else {
-        this.save(dto);
-      }
-      
       // for test
       if (dto.isCompensate() == false) {
         if (dto.getTestCase() == 2) {
           log.debug("Test case 2: journal timeout");
-          try { Thread.sleep(13 * 1000); } catch (InterruptedException e) { e.printStackTrace(); }          
+          try { Thread.sleep(13 * 1000); } catch (InterruptedException e) { e.printStackTrace(); }  
+          return null;
         } else if (dto.getTestCase() == 1) {
           log.debug("Test case 1: journal hold");
           try { Thread.sleep(5 * 1000); } catch (InterruptedException e) { e.printStackTrace(); }        
         }
       }
       
+      if (dto.isCompensate()) {
+        log.debug("Journal Compensate");
+        this.compensateSave(dto);
+      } else {
+        this.save(dto);
+      }
+      
       log.debug("Journal Rep to Orch Queue");
-      sendSagaEvent("orchQueue", dto);
+      //sendSagaEvent("orchQueue", dto);
+      return dto;
+      
     } finally {
       unLock(dto);
     }
