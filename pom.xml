@@ -199,5 +199,8 @@
     <module>common-api</module>
     <module>swift-messaging</module>
     <module>main-service</module>
+    <module>service1</module>
+    <module>service2</module>
+    <module>service3</module>
   </modules>
 </project>
