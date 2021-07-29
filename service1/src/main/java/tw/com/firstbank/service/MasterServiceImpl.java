@@ -16,6 +16,7 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -47,11 +48,18 @@ public class MasterServiceImpl implements MasterService {
   @Autowired
   RabbitTemplate rabbitTemplate;
   
-  String updateMasterUrl = "http://localhost:8080/api/master";
-  String updateTempUrl = "http://localhost:8081/api/temp";
-  String updateJournalUrl = "http://localhost:8082/api/journal";
+  @Value("${service1-url:http://localhost:8080/api/master}")
+  String updateMasterUrl;
   
-  private Integer timeoutSeconds = 10;
+  @Value("${service2-url:http://localhost:8081/api/temp}")
+  String updateTempUrl;
+
+  @Value("${service3-url:http://localhost:8082/api/journal}")
+  String updateJournalUrl;
+  
+  @Value("${timeout-second:10}")
+  Integer timeoutSeconds;
+  
   private final ObjectMapper objectMapper = new ObjectMapper();
   
   @Transactional
