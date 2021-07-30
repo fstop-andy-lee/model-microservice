@@ -1,0 +1,29 @@
+[Unit]
+Description=service1
+After=syslog.target
+
+[Service]
+User=api
+TimeoutStopSec=45s
+#WorkingDirectory=/opt/service1
+
+ExecStart=/usr/bin/java \
+    -cp "/opt/service1/conf:/opt/service1/lib/*" \
+    -Dspring.application.admin.enabled=false \
+    -Dfile.encoding=UTF8 \
+    -Djava.awt.headless=true \
+	-Djava.security.egd=file:/dev/urandom \
+    -Dlogger.file=/opt/service1/conf/logback.xml \
+	-Dloader.main=tw.com.firstbank.Service1App \
+	-Dspring.profiles.active=prod \
+    -Xms256m \
+    -Xmx1024m \
+    -XX:+HeapDumpOnOutOfMemoryError \
+    -XX:HeapDumpPath=/tmp \
+    org.springframework.boot.loader.PropertiesLauncher
+    
+
+SuccessExitStatus=143
+
+[Install]
+WantedBy=multi-user.target

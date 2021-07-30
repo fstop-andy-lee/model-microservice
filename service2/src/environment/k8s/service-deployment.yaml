@@ -1,0 +1,116 @@
+## service deploy
+# kubectl delete -f service-deployment.yaml
+# minikube kubectl -- delete -f ./service-deployment.yaml
+
+# kubectl create -f service-deployment.yaml
+# minikube kubectl -- create -f ./service-deployment.yaml
+
+
+# create role to list service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+ name: list-service
+ namespace: default
+rules:
+# - apiGroups:
+#    - ''
+#   resources:
+#    - pods
+#   verbs:
+#    - list    
+  - apiGroups: [""]
+    resources: ["pods", "endpoints", "services", "configmaps"]
+    verbs: ["get", "watch", "list"]   
+---
+# create service account for app
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: app-user   
+ namespace: default
+---
+# binding role to service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+ name: list-service_app-user
+ namespace: default
+roleRef:
+ kind: ClusterRole
+ name: list-service
+ apiGroup: rbac.authorization.k8s.io
+subjects:
+ - kind: ServiceAccount
+   name: app-user
+   namespace: default
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: service2
+data:
+  profile: dev-k8s
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service2
+spec:
+  selector:
+    app: service2
+    
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8080
+      nodePort: 30092
+      
+  #type: LoadBalancer
+  #ports:
+  #  - name: http
+  #    port: 8888
+  #    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: service2
+spec:
+  selector:
+      matchLabels:
+        app: service2
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: service2
+    spec:
+      # pod service account
+      serviceAccountName: app-user
+      containers:
+        - name: service2
+          image: andylee/service2:latest
+          imagePullPolicy: Always #IfNotPresent
+          args: ["--spring.config.location=/home/spring/app/conf/"]
+          ports:
+            - name: http
+              containerPort: 8080
+          env:
+            #- name: JAVA_OPTIONS
+            #  value: "-Dspring.profiles.active=${profile}"
+            #- name: ENVIRONMENT
+            #  valueFrom:
+            #    configMapKeyRef:
+            #      name: service1
+            #      key: profile    
+          
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                    name: service2
+                    key: profile
+            #- name: SPRING_CONFIG_LOCATION
+            #  value: "/home/spring/app/conf/"   
+                 
