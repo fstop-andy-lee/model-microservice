@@ -1,5 +1,8 @@
 package tw.com.firstbank.adapter.controller;
 
+import java.io.IOException;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -11,12 +14,15 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 
+import io.swagger.annotations.ApiOperation;
 //import io.opentracing.Tracer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.annotation.WebAdapter;
-import tw.com.firstbank.model.SwiftMessage;
+import tw.com.firstbank.model.SwiftMessageDto;
+import tw.com.firstbank.service.SwiftService;
 
 @WebAdapter
 @CrossOrigin
@@ -29,12 +35,17 @@ public class SendMessagingController implements SendMessagingApi {
   @Autowired
   private RestTemplate restTemplate;
   
+  @Autowired
+  private SwiftService service;
+  
   @Value("${server.port}")
   private int port;
   
   //@Autowired
   //private Tracer tracer;
   
+  //@Hidden
+  @ApiOperation(value = "This method is hidden.", hidden = true)
   @GetMapping(value="/")
   ResponseEntity<String> index() {
     log.debug("index");
@@ -43,6 +54,7 @@ public class SendMessagingController implements SendMessagingApi {
         HttpStatus.OK);
   }
   
+  @ApiOperation(value = "This method is hidden.", hidden = true)
   @GetMapping(value="/test")
   ResponseEntity<String> test() {
     log.debug("test");
@@ -52,6 +64,7 @@ public class SendMessagingController implements SendMessagingApi {
   }
   
   // spring mvc 方式，一定報錯
+  @ApiOperation(value = "This method is hidden.", hidden = true)
   @RequestMapping("/e-tracing")
   public String eTracing() throws InterruptedException {
       Thread.sleep(100);
@@ -59,6 +72,7 @@ public class SendMessagingController implements SendMessagingApi {
   }
 
   //spring mvc 方式，一定報錯
+  @ApiOperation(value = "This method is hidden.", hidden = true)
   @RequestMapping("/e-open")
   public String eOpen() throws InterruptedException {
       ResponseEntity<String> response = 
@@ -68,6 +82,7 @@ public class SendMessagingController implements SendMessagingApi {
       return "open " + response.getBody();
   }
   
+  @ApiOperation(value = "This method is hidden.", hidden = true)
   @GetMapping("/open")
   public ResponseEntity<String> open() throws InterruptedException {
       ResponseEntity<String> response = 
@@ -79,6 +94,7 @@ public class SendMessagingController implements SendMessagingApi {
           HttpStatus.OK);
   }
   
+  @ApiOperation(value = "This method is hidden.", hidden = true)
   @GetMapping("/tracing")
   public ResponseEntity<String> tracing() throws InterruptedException {
       Thread.sleep(100);
@@ -88,10 +104,23 @@ public class SendMessagingController implements SendMessagingApi {
   }
 
   @Override
-  public ResponseEntity<Void> sendMessage(@Valid SwiftMessage body) {   
+  public ResponseEntity<Void> sendMessage(@Valid SwiftMessageDto body) {   
     String accept = request.getHeader("Accept");
     log.debug(accept);
     return new ResponseEntity<Void>(HttpStatus.NOT_IMPLEMENTED);
+  }
+
+  @Override
+  public ResponseEntity<Integer> uploadMessage(List<MultipartFile> files,
+      HttpServletRequest httpServletReq) {
+    Integer ret = 0;
+    try {
+      ret = service.uploadSwiftFiles(files);
+    } catch (IOException e) {
+      log.error(e.getMessage(), e);
+      e.printStackTrace();
+    }
+    return new ResponseEntity<Integer>(ret, HttpStatus.OK);
   }
   
 }
