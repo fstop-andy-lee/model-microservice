@@ -2,12 +2,10 @@ package tw.com.firstbank.service;
 
 import lombok.Getter;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.model.SwiftBlock;
 
 @Getter
 @Setter
-@Slf4j
 public class SwiftBlockParser {
   
   Integer marker = 0;

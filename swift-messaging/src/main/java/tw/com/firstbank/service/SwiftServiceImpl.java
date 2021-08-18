@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.model.SwiftMessage;
 import tw.com.firstbank.model.SwiftTask;
+import tw.com.firstbank.model.SwiftTextTag;
 
 @Slf4j
 @Service
@@ -53,6 +54,10 @@ public class SwiftServiceImpl implements SwiftService {
           
           d = msg.getApHeader().toString();
           log.debug(d);
+          
+          for(SwiftTextTag tag : msg.getTextBlock().getTags()) {
+            log.debug("Name={} Value={}", tag.getName(), tag.getValue());
+          }
         }
         
         
