@@ -202,5 +202,6 @@
     <module>service1</module>
     <module>service2</module>
     <module>service3</module>
+    <module>fx-common-module</module>
   </modules>
 </project>

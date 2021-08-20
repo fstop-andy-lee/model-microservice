@@ -8,8 +8,8 @@ http://localhost:8080/h2-console
 ## 測試
  
     在 windows 下使用 curl 時必需注意:
-    curl -v -F extraField="abc" -F files=@"C://temp//MTxxx.txt" http://localhost:8080/upload
-    curl -v -F extraField="abc" -F files=@"C://temp/MTxxx.txt" http://localhost:8080/upload
+    curl -v -F extraField="abc" -F files=@"C://temp//MT103.txt" http://localhost:8080/swift/v1/upload
+    curl -v -F extraField="abc" -F files=@"C://temp/MT103.txt" http://localhost:8080/swift/v1/upload
 
  ```
   

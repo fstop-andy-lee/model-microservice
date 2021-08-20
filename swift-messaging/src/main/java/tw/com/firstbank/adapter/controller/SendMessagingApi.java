@@ -8,10 +8,11 @@ import javax.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
+
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import tw.com.firstbank.model.SwiftMessageDto;
+
 
 @Api(tags="Send Swift Message API", produces=MediaType.APPLICATION_JSON_VALUE)
 @Validated
@@ -60,5 +62,26 @@ public interface SendMessagingApi {
       @ApiParam(value = "Swift files", required = true)  
       @RequestPart(name="files", required=false) List<MultipartFile> files
       , @ApiParam(hidden = true) HttpServletRequest httpServletReq);
+  
+  @ApiOperation(value = "",
+      notes = "Send Swift Messages from swift_message table.\n"
+              + " \n")
+      @ApiResponses(value = {
+             @ApiResponse(code = 200, message = "SUCCESS")
+           , @ApiResponse(code = 400, message = "INVALID_PARAM")
+           , @ApiResponse(code = 1999, message = "EXCEPTION")
+           , @ApiResponse(code = 1002, message = "PARAM_VALUE_FAIL")
+          })
+  @RequestMapping(method = {RequestMethod.GET}    
+      , value = "/send"
+      , produces = {MediaType.APPLICATION_JSON_VALUE}
+      , consumes = {MediaType.ALL_VALUE}
+          )
+  @ResponseBody
+  ResponseEntity<Integer> send(
+        @ApiParam(value = "records", required = false, defaultValue="10")
+        @RequestParam(required = false, defaultValue = "10") Integer records);
+
+  
   
 }

@@ -13,8 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.MediaType;
 
 import io.swagger.annotations.ApiOperation;
 //import io.opentracing.Tracer;
@@ -23,11 +25,18 @@ import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.annotation.WebAdapter;
 import tw.com.firstbank.model.SwiftMessageDto;
 import tw.com.firstbank.service.SwiftService;
+import tw.com.firstbank.util.DateTimeUtil;
 
+@Slf4j
 @WebAdapter
 @CrossOrigin
 @RequiredArgsConstructor
-@Slf4j
+@RequestMapping(
+    value = "/swift/v1"
+  , produces = {MediaType.APPLICATION_JSON_VALUE}
+  , headers = {"content-type=application/x-www-form-urlencoded"}
+  , consumes = {MediaType.APPLICATION_FORM_URLENCODED_VALUE, MediaType.APPLICATION_JSON_VALUE}
+  )
 public class SendMessagingController implements SendMessagingApi {
 
   private final HttpServletRequest request;
@@ -117,6 +126,21 @@ public class SendMessagingController implements SendMessagingApi {
     try {
       ret = service.uploadSwiftFiles(files);
     } catch (IOException e) {
+      log.error(e.getMessage(), e);
+      e.printStackTrace();
+    }
+    return new ResponseEntity<Integer>(ret, HttpStatus.OK);
+  }
+
+  @Override
+  public ResponseEntity<Integer> send(@RequestParam Integer records) {
+    Integer ret = 0;
+    try {
+      log.debug(DateTimeUtil.getYYYY());
+      
+      ret = service.send(records);
+      
+    } catch (Exception e) {
       log.error(e.getMessage(), e);
       e.printStackTrace();
     }

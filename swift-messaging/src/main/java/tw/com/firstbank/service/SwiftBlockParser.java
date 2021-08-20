@@ -89,7 +89,7 @@ public class SwiftBlockParser {
         }
       } else if (ch == ':') {
         id += 1;
-      } else if (ch == 0x13) {
+      } else if (ch == '\n' || ch == '\r') {
         // 判斷是否進入 text block， 進入 text block 後 isTagArea = True
         if (isTagArea == false) {
           if (sb.toString().equals("{4:")) {
@@ -128,6 +128,7 @@ public class SwiftBlockParser {
       char c = chars[ret];
       if (c == '{') {
         if (textBlockStart) {
+          
           sb.append(c);
           continue;
         }
