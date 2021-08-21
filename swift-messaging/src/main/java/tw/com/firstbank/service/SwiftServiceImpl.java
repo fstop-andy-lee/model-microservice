@@ -3,27 +3,25 @@ package tw.com.firstbank.service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
-import tw.com.firstbank.domain.type.SwiftMessageStatus;
+import tw.com.firstbank.entity.Bafotr;
+import tw.com.firstbank.entity.BankInfo;
 import tw.com.firstbank.entity.InwardRmt;
 import tw.com.firstbank.entity.SwiftMessageLog;
 import tw.com.firstbank.model.SwiftMessage;
 import tw.com.firstbank.model.SwiftTask;
 import tw.com.firstbank.model.SwiftTextTag;
 import tw.com.firstbank.repository.BankInfoRepository;
-import tw.com.firstbank.repository.InwardRmtRepository;
-import tw.com.firstbank.repository.SwiftMessageRepository;
+
 import tw.com.firstbank.util.DateTimeUtil;
 
 @Slf4j
@@ -31,13 +29,10 @@ import tw.com.firstbank.util.DateTimeUtil;
 public class SwiftServiceImpl implements SwiftService {
   
   @Autowired
-  private SwiftMessageRepository swiftMsgRepo;
-  
-  @Autowired
-  private InwardRmtRepository inwardRmtRepo;
-  
-  @Autowired
   private BankInfoRepository bankInfoRepo;
+  
+  @Autowired
+  private RepositoryHelper repoHelper;
   
   @Override
   public Integer uploadSwiftFiles(List<MultipartFile> files) throws IOException {
@@ -82,7 +77,7 @@ public class SwiftServiceImpl implements SwiftService {
           }
         }
         
-        saveInactiveSwiftMessageLog(fileContent);
+        repoHelper.saveInactiveSwiftMessageLog(fileContent);
 
         ret++;
       } catch (ParseException e) {
@@ -94,43 +89,56 @@ public class SwiftServiceImpl implements SwiftService {
     
     return ret;
   }
-  
-  private String saveInactiveSwiftMessageLog(String content) {
-    String id = generateId();
-    SwiftMessageLog msgLog = new SwiftMessageLog();
-    msgLog.setId(id);
-    msgLog.setMsg(content);
-    msgLog.setStatus(SwiftMessageStatus.INACTIVE);
-    swiftMsgRepo.save(msgLog);
-    return id;
-  }
-  
-  private String generateId() {
-    return UUID.randomUUID().toString();
-  }
 
   @Override
   public Integer send(Integer records) {
-    //Page<SwiftMessageLog> page = repo.findAll(
-    //    PageRequest.of(0, records, Sort.by(Sort.Direction.ASC, "id")));
-    List<SwiftMessageLog> logs = findInactiveMsgs(records);
+    List<SwiftMessageLog> logs = repoHelper.findInactiveMsgs(records);
     
     log.debug("records = {}", logs.size());
     
     for(SwiftMessageLog msg : logs) {
       log.debug(msg.getMsg());
-      
-      
+       
       SwiftTask task = this.parseSwiftMessage(msg.getMsg());
-      // convert task to InwardRmt
-      from103(msg.getId(), task);
+      // convert task to InwardRmt 
+      List<InwardRmt> rmts = from103(msg.getId(), task);
       
-      // save InwardRmt
+      for(InwardRmt rmt : rmts) {
+        processInwardRmt(msg, rmt);
+      }
       
-      // update status to done if success
     }
         
     return logs.size();
+  }
+  
+  private void processInwardRmt(SwiftMessageLog msg, InwardRmt rmt) {
+    try {
+      // check corr
+      if (isValidReceiverCorr(rmt.getReceiverCorr())) {               
+        repoHelper.parseComplete(msg, rmt, addBafotr(rmt));
+      } else {
+        repoHelper.parsePending(msg);
+      }        
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+    }
+  }
+  
+  private Bafotr addBafotr(InwardRmt rmt) {
+    Bafotr ret = null;
+    ret = new Bafotr();
+    
+    ret.setBic(rmt.getReceiverCorr());
+    ret.setCcy(rmt.getCcy());
+    ret.setCrAmt(rmt.getAmt());
+    
+    return ret;
+  }
+    
+  private Boolean isValidReceiverCorr(String bic) {
+    Optional<BankInfo> opt = bankInfoRepo.findByBicAndIsCorr(bic, true);
+    return opt.isPresent();
   }
   
   private List<InwardRmt> from103(String taskId, SwiftTask task) {
@@ -167,16 +175,27 @@ public class SwiftServiceImpl implements SwiftService {
         } else if (tagName.startsWith("59")) {
           // 59, 59A, 59F
           rmt.setBenefCust(tagValue);
+          rmt.setBenefAcct(acctFromTag(tagValue));
+          
         } else if (tagName.startsWith("71A")) {
           rmt.setDetailCharge(tagValue);
-        }
-        
+        } else if (tagName.startsWith("53A")) { //-- optional
+          rmt.setSenderCorr(tagValue);
+        } else if (tagName.startsWith("54A")) {
+          rmt.setReceiverCorr(tagValue);
+        } else if (tagName.startsWith("71F")) {
+          rmt.setSenderChargeCcy(chargeCcy(tagValue));
+          rmt.setSenderCharge(chargeAmt(tagValue));          
+        } else if (tagName.startsWith("71G")) {
+          rmt.setReceiverChargeCcy(chargeCcy(tagValue));
+          rmt.setReceiverCharge(chargeAmt(tagValue));          
+        }        
         
       }  // for tags
       
       rmt.setId(taskId);
       
-      inwardRmtRepo.save(rmt);
+      ret.add(rmt);
       
     }  // for msg
     
@@ -203,6 +222,22 @@ public class SwiftServiceImpl implements SwiftService {
     return ret;
   }
   
+  private String chargeCcy(String tag) {
+    return tag.substring(0, 3);
+  }
+  
+  private Float chargeAmt(String tag) {
+    return amtFromTag(tag.substring(3));
+  }
+  
+  private String acctFromTag(String tag) {
+    String ret = "";
+    if (tag.startsWith("/")) {
+      ret = tag.split("\\R")[0].substring(1);
+    }
+    return ret;
+  }
+  
   private Float amtFromTag(String tag) {
     Float ret = null;
     String value = tag;    
@@ -210,11 +245,7 @@ public class SwiftServiceImpl implements SwiftService {
     ret = Float.valueOf(value);    
     return ret;
   }
-  
-  private List<SwiftMessageLog> findInactiveMsgs(Integer records) {
-    return swiftMsgRepo.findInactive(records);
-  }
-  
+    
   private SwiftTask parseSwiftMessage(String input){
     SwiftParser p = new SwiftParser();
     SwiftTask task = null;

@@ -39,7 +39,8 @@ create table inward_rmt (
   ccy varchar(3),
   amt decimal(13,2),
   order_cust varchar(140),
-  benef_cust varchar(100), -- 140
+  benef_cust varchar(40), -- 140
+  benef_acct varchar(35),
   sender_corr varchar(35),
   receiver_corr varchar(35),
   rmt_info varchar(140),
@@ -52,7 +53,19 @@ create table inward_rmt (
   bank_info varchar(210) -- bank to bank
 );
 ----
+drop table if exists bafotr;
+create table bafotr (
+  id varchar(40) primary key,  -- bank id : ccy
+  bic varchar(11),
+  ccy varchar(3),
+  acct varchar(35),
+  db_amt decimal(13, 2),
+  cr_amt decimal(13, 2)
+);  
 
+---- for black list
+-- SELECT id FROM inward_rmt WHERE position('MARK' in order_cust)>0;
+-- SELECT id FROM inward_rmt WHERE strpos(order_cust, 'MARK') > 0;
 
 
 

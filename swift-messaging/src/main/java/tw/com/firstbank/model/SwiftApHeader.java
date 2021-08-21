@@ -11,8 +11,8 @@ import lombok.ToString;
 @ToString(of = {"io", "msgType", "rcvAddr", "priority", "monitor", "period"})
 public class SwiftApHeader {
 
-  public static String SWIFT_INPUT = "I";  
-  public static String SWIFT_OUTPUT = "O";
+  public static String SWIFT_INPUT = "I";  // We are Sender
+  public static String SWIFT_OUTPUT = "O"; // We are Recipient
   
   public static String PRIORITY_UERGEN = "U";
   public static String PRIORITY_NORMAL = "N";

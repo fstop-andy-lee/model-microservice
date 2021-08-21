@@ -24,7 +24,7 @@ import tw.com.firstbank.domain.type.VerifyStatusConverter;
 @Setter
 @NoArgsConstructor
 @ToString(of = {"id", "status", "verifyStatus", "valueDate", "ccy", "amt", "benefCust"})
-public class InwardRmt  implements Serializable {
+public class InwardRmt implements Serializable {
 
   private static final long serialVersionUID = 3479500368711395238L;
 
@@ -60,6 +60,9 @@ public class InwardRmt  implements Serializable {
   
   @Column(name = "benef_cust", nullable=true)
   private String benefCust;
+  
+  @Column(name = "benef_acct", nullable=true)
+  private String benefAcct;
 
   @Column(name = "sender_corr", nullable=true)
   private String senderCorr;
