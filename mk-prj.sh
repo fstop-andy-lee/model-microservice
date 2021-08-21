@@ -6,4 +6,5 @@
 # mvn archetype:generate -DgroupId=tw.com.firstbank  -DartifactId=service1 -DinteractiveMode=false
 # mvn archetype:generate -DgroupId=tw.com.firstbank  -DartifactId=service2 -DinteractiveMode=false
 # mvn archetype:generate -DgroupId=tw.com.firstbank  -DartifactId=service3 -DinteractiveMode=false
-mvn archetype:generate -DgroupId=tw.com.firstbank  -DartifactId=fx-common-module -DinteractiveMode=false
+# mvn archetype:generate -DgroupId=tw.com.firstbank  -DartifactId=fx-common-module -DinteractiveMode=false
+mvn archetype:generate -DgroupId=tw.com.firstbank  -DartifactId=aml-service -DinteractiveMode=false

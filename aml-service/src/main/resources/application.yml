@@ -1,6 +1,6 @@
 server:
   address: 0.0.0.0
-  port: 8080
+  port: 8090
   servlet:
     contextPath: /
 
@@ -15,7 +15,7 @@ server:
 
 spring:
   application:
-    name: swift-messaging
+    name: aml-service
 
   ## enabling overriding by setting spring.main.allow-bean-definition-overriding=true
   main:
@@ -125,6 +125,6 @@ opentracing:
 #        path: /api-docs
 
 feature:
-  swift-messaging: true
+  aml-service: true
       
 

@@ -203,5 +203,6 @@
     <module>service2</module>
     <module>service3</module>
     <module>fx-common-module</module>
+    <module>aml-service</module>
   </modules>
 </project>

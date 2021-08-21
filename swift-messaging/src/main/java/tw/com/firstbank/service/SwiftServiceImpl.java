@@ -13,6 +13,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
+import tw.com.firstbank.adapter.gateway.AmlGateway;
 import tw.com.firstbank.entity.Bafotr;
 import tw.com.firstbank.entity.BankInfo;
 import tw.com.firstbank.entity.InwardRmt;
@@ -34,6 +35,9 @@ public class SwiftServiceImpl implements SwiftService {
   @Autowired
   private RepositoryHelper repoHelper;
   
+  @Autowired
+  private AmlGateway amlGateway;
+   
   @Override
   public Integer uploadSwiftFiles(List<MultipartFile> files) throws IOException {
     Integer ret = 0;
@@ -114,12 +118,22 @@ public class SwiftServiceImpl implements SwiftService {
   
   private void processInwardRmt(SwiftMessageLog msg, InwardRmt rmt) {
     try {
+      
       // check corr
       if (isValidReceiverCorr(rmt.getReceiverCorr())) {               
         repoHelper.parseComplete(msg, rmt, addBafotr(rmt));
       } else {
         repoHelper.parsePending(msg);
-      }        
+      }       
+      
+      // check aml
+      // 是否應該取 CIF 的姓名?
+      if (amlGateway.screenByApi(rmt.getBenefCust()) > 0) {
+        log.debug("AML HIT");
+      } else {
+        log.debug("AML OK");
+      }
+      
     } catch(Exception e) {
       log.error(e.getMessage(), e);
     }

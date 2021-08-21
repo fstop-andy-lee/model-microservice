@@ -20,7 +20,7 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @ToString(of = {"id", "bic", "ccy", "acct", "dbAmt", "crAmt"})
-public class Bafotr  implements Serializable {
+public class Bafotr implements Serializable {
   
   private static final long serialVersionUID = -6423095334629526550L;
   

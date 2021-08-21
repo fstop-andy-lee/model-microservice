@@ -14,7 +14,7 @@ insert into bank_info (id, bic, corr_flag) values
 ('BKTRUS33', 'BKTRUS33', true),
 ('IRVTUS3N', 'IRVTUS3N', false)
 ;
-  
+ 
 ----
 insert into swift_message (id, status, msg) values  
 ('1', 0,
@@ -91,7 +91,7 @@ TAINAN
 BRANCH 82 CHUNG YI RD, SECTION 2
 TAINAN
 :59:/62610123456
-TEST CO.
+bin CO.
 NO.33.
 TAINAN
 :70:PO 45845
