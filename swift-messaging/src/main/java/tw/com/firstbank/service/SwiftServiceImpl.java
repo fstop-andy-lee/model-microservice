@@ -1,6 +1,7 @@
 package tw.com.firstbank.service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,18 +16,28 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.domain.type.SwiftMessageStatus;
+import tw.com.firstbank.entity.InwardRmt;
 import tw.com.firstbank.entity.SwiftMessageLog;
 import tw.com.firstbank.model.SwiftMessage;
 import tw.com.firstbank.model.SwiftTask;
 import tw.com.firstbank.model.SwiftTextTag;
+import tw.com.firstbank.repository.BankInfoRepository;
+import tw.com.firstbank.repository.InwardRmtRepository;
 import tw.com.firstbank.repository.SwiftMessageRepository;
+import tw.com.firstbank.util.DateTimeUtil;
 
 @Slf4j
 @Service
 public class SwiftServiceImpl implements SwiftService {
   
   @Autowired
-  private SwiftMessageRepository repo;
+  private SwiftMessageRepository swiftMsgRepo;
+  
+  @Autowired
+  private InwardRmtRepository inwardRmtRepo;
+  
+  @Autowired
+  private BankInfoRepository bankInfoRepo;
   
   @Override
   public Integer uploadSwiftFiles(List<MultipartFile> files) throws IOException {
@@ -90,7 +101,7 @@ public class SwiftServiceImpl implements SwiftService {
     msgLog.setId(id);
     msgLog.setMsg(content);
     msgLog.setStatus(SwiftMessageStatus.INACTIVE);
-    repo.save(msgLog);
+    swiftMsgRepo.save(msgLog);
     return id;
   }
   
@@ -112,6 +123,7 @@ public class SwiftServiceImpl implements SwiftService {
       
       SwiftTask task = this.parseSwiftMessage(msg.getMsg());
       // convert task to InwardRmt
+      from103(msg.getId(), task);
       
       // save InwardRmt
       
@@ -121,8 +133,86 @@ public class SwiftServiceImpl implements SwiftService {
     return logs.size();
   }
   
+  private List<InwardRmt> from103(String taskId, SwiftTask task) {
+    List<InwardRmt> ret = new ArrayList<>();
+    log.debug("msg cnt = {}", task.getMessages().size());
+    
+    for(SwiftMessage msg : task.getMessages()) {
+      String msgType = msg.getApHeader().getMsgType();
+      if (!"103".equals(msgType)) {
+        continue;
+      }
+      
+      InwardRmt rmt = new InwardRmt();
+      
+      log.debug("text cnt {}", msg.getTextBlock().count());
+      for(SwiftTextTag tag : msg.getTextBlock().getTags()) {
+        
+        log.debug("Name={} Value={}", tag.getName(), tag.getValue());
+        
+        String tagName = tag.getName();
+        String tagValue = tag.getValue();
+        
+        if (tagName.startsWith("20")) {
+          rmt.setTxnRefNo(tagValue);
+        } else if (tagName.startsWith("23B")) {
+          rmt.setBankOpCode(tagValue);
+        } else if (tagName.startsWith("32A")) {
+          rmt.setValueDate(valueDateFrom32A(tagValue));
+          rmt.setCcy(ccyFrom32A(tagValue));
+          rmt.setAmt(amtFrom32A(tagValue));          
+        } else if (tagName.startsWith("50")) {
+          // A, F, K
+          rmt.setOrderCust(tagValue);
+        } else if (tagName.startsWith("59")) {
+          // 59, 59A, 59F
+          rmt.setBenefCust(tagValue);
+        } else if (tagName.startsWith("71A")) {
+          rmt.setDetailCharge(tagValue);
+        }
+        
+        
+      }  // for tags
+      
+      rmt.setId(taskId);
+      
+      inwardRmtRepo.save(rmt);
+      
+    }  // for msg
+    
+    return ret;
+  }
+  
+  private Integer valueDateFrom32A(String tag) {
+    Integer ret = null;
+    // append yyyy
+    String value = DateTimeUtil.getYYYY().substring(0, 2) + tag.substring(0, 6);
+    ret = Integer.parseInt(value);    
+    return ret;
+  }
+  
+  private String ccyFrom32A(String tag) {
+    String ret = tag.substring(6, 6+3);    
+    return ret;
+  }
+  
+  private Float amtFrom32A(String tag) {
+    Float ret = null;
+    String value = tag.substring(9);
+    ret = amtFromTag(value);
+    return ret;
+  }
+  
+  private Float amtFromTag(String tag) {
+    Float ret = null;
+    String value = tag;    
+    value = value.replaceAll(",", ".");
+    ret = Float.valueOf(value);    
+    return ret;
+  }
+  
   private List<SwiftMessageLog> findInactiveMsgs(Integer records) {
-    return repo.findInactive(records);
+    return swiftMsgRepo.findInactive(records);
   }
   
   private SwiftTask parseSwiftMessage(String input){
