@@ -154,9 +154,11 @@ public class SwiftServiceImpl implements SwiftService {
         printRmtAdvice(rmt);
         // wating for payment
         repoHelper.markPayment(rmt);
+        
+        repoHelper.payment(rmt);
       }
       
-      //TODO: payment
+      // 異常
       
     } catch(Exception e) {
       log.error(e.getMessage(), e);
@@ -195,7 +197,7 @@ public class SwiftServiceImpl implements SwiftService {
         // wating for payment
         repoHelper.markPayment(rmt);
          
-        //TODO: payment
+        repoHelper.payment(rmt);
       }
       
       // 異常

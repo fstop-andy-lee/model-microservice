@@ -5,7 +5,8 @@ create table master (
   hold_mark varchar(100),
   balance decimal(18,2) ,
   status INT default 0,
-  name varchar(200)
+  name varchar(200),
+  unino varchar(11)
 );
 ---- 銀行名錄檔
 drop table if exists bank_info;
@@ -82,7 +83,64 @@ create table rmt_advice (
   status int default 0 
 );  
 
+---- 會計 
+drop table if exists acmr;
+create table acmr (
+  id varchar(40) not null, -- acno
+  db_cnt int not null,
+  db_amt decimal(13, 2),
+  cr_cnt int not null,
+  cr_amt decimal(13, 2),  
+  primary key (id)
+);
 
+---- 央行媒體申報檔
+drop table if exists rmt_cb_rpt3;
+create table rmt_cb_rpt3 (
+  id serial not null, 
+  job_code varchar(1) default '3',
+  bank varchar(4),
+  ccy varchar(3),
+  rem_type varchar(1),
+  value_date varchar(8),
+  data_no varchar(12),
+  ban_idno varchar(10),
+  birth_date varchar(8),
+  issue_date varchar(8),
+  exp_date varchar(8),
+  kind_code varchar(1),
+  data_kind varchar(1),
+  data_amt_sign varchar(1),
+  data_amt decimal(14, 2), 
+  forward_split varchar(1),
+  class varchar(3),
+  top varchar(1),
+  sub_code_690 varchar(1),
+  cntry varchar(2),
+  no_rep_flag varchar(1),
+  q_id varchar(2),
+  natural_flag varchar(1),
+  aprov_no_flag varchar(1),
+  spec_bank varchar(4),
+  docu_no varchar(7),
+  nt_exchg_rate decimal(11, 8),
+  oppo_name varchar(40),
+  swift_bank varchar(11),
+  oppo_bank varchar(50),
+  trade_type varchar(1),
+  trade_date varchar(8),
+  data_source varchar(1) default 'M',  
+  primary key (id)
+);
+
+---- 央行額度通報檔(RmtCbQta)
+drop table if exists rmt_cb_qta;
+create table rmt_cb_qta (
+  id varchar(40) not null,
+  unino varchar(11),
+  amt decimal(13, 2),
+  primary key (id)
+);
 
 
 

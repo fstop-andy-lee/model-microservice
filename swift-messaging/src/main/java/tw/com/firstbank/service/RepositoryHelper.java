@@ -22,4 +22,5 @@ public interface RepositoryHelper {
   
   public void parseComplete(SwiftMessageLog msg, InwardRmt rmt, Bafotr otr);
   public void parsePending(SwiftMessageLog msg);
+  public void payment(InwardRmt rmt);
 }
