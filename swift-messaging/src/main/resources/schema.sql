@@ -133,12 +133,22 @@ create table rmt_cb_rpt3 (
   primary key (id)
 );
 
----- 央行額度通報檔(RmtCbQta)
+---- 央行額度通報檔
 drop table if exists rmt_cb_qta;
 create table rmt_cb_qta (
   id varchar(40) not null,
   unino varchar(11),
   amt decimal(13, 2),
+  primary key (id)
+);
+
+---- 累計資金部位檔
+drop table if exists position;
+create table position (
+  id varchar(40) not null,  -- ccy
+  cr_amt decimal(13, 2),  -- 入
+  db_amt decimal(13, 2),  -- 出
+  net_amt decimal(13, 2),
   primary key (id)
 );
 

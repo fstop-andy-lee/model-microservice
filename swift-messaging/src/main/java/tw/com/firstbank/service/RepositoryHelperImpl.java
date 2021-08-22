@@ -16,6 +16,7 @@ import tw.com.firstbank.entity.AcMr;
 import tw.com.firstbank.entity.Bafotr;
 import tw.com.firstbank.entity.InwardRmt;
 import tw.com.firstbank.entity.Master;
+import tw.com.firstbank.entity.Position;
 import tw.com.firstbank.entity.RmtAdvice;
 import tw.com.firstbank.entity.RmtCbQta;
 import tw.com.firstbank.entity.RmtCbRpt3;
@@ -24,6 +25,7 @@ import tw.com.firstbank.repository.AcMrRepository;
 import tw.com.firstbank.repository.BafotrRepository;
 import tw.com.firstbank.repository.InwardRmtRepository;
 import tw.com.firstbank.repository.MasterRepository;
+import tw.com.firstbank.repository.PositionRepository;
 import tw.com.firstbank.repository.RmtAdviceRepository;
 import tw.com.firstbank.repository.RmtCbQtaRepository;
 import tw.com.firstbank.repository.RmtCbRpt3Repository;
@@ -61,6 +63,9 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   
   @Autowired
   private RmtCbQtaRepository rmtCbQtaRepo;
+  
+  @Autowired
+  private PositionRepository positionRepo;  
   
   private String generateId() {
     return UUID.randomUUID().toString();
@@ -130,6 +135,11 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     saveInwardRmt(rmt);
   }
   
+  public void markDone(InwardRmt rmt) {
+    rmt.setStatus(InwardRmtStatus.DONE);
+    saveInwardRmt(rmt);
+  }
+  
   public void saveRmtAdvice(RmtAdvice advice) {
     rmtAdviceRepo.save(advice);
   }
@@ -140,8 +150,12 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   
   @Transactional
   public void parseComplete(SwiftMessageLog msg, InwardRmt rmt, Bafotr otr) {
+    
+    // 匯入資料檔
     saveInwardRmt(rmt);
     markDone(msg);
+    
+    // 存同
     addBafotr(otr);
   }
   
@@ -153,19 +167,23 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   @Transactional
   public void payment(InwardRmt rmt) {
     
-    // 入扣帳 I/O
+    // 1 入扣帳 I/O
     creditAccount(rmt);
     
-    // 會計 I/O
+    // 2 會計 I/O
     creditAcMr(rmt);
     
-    // 央行媒體申報 I/O
+    // 3 央行媒體申報 I/O
     createRmtCbRpt3(rmt);
     
-    // 央行額度通報 I/O
+    // 4 央行額度通報 I/O
     createRmtCbQta(rmt);
     
+    // 5 累計資金部位 I/O
+    creditPosition(rmt);
     
+    // 6 匯入資料檔 I/O
+    markDone(rmt);
     
   }
   
@@ -216,6 +234,7 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     RmtCbRpt3 rpt = new RmtCbRpt3();
     
     rpt.setCcy(rmt.getCcy());
+    rpt.setDataAmtSign("+");
     rpt.setDataAmt(rmt.getInstAmt());    
     rpt.setValueDate(rmt.getValueDate().toString());
     
@@ -239,6 +258,16 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     qta.setUnino(master.getUnino());
     
     rmtCbQtaRepo.save(qta);
+  }
+  
+  public void creditPosition(InwardRmt rmt) {
+    Position pos = new Position();
+    pos.setId(rmt.getCcy());
+    pos.setCrAmt(pos.getCrAmt().add(rmt.getInstAmt()));
+    
+    pos.setNetAmt(pos.getCrAmt().subtract(pos.getDbAmt()));
+    
+    positionRepo.save(pos);
   }
   
   private AcMr findAcMr(String acno) {
