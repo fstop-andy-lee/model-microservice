@@ -23,7 +23,7 @@ import tw.com.firstbank.domain.type.VerifyStatusConverter;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(of = {"id", "status", "verifyStatus", "valueDate", "ccy", "amt", "benefCust"})
+@ToString(of = {"id", "status", "verifyStatus", "valueDate", "ccy", "instAmt", "benefCust"})
 public class InwardRmt implements Serializable {
 
   private static final long serialVersionUID = 3479500368711395238L;
@@ -52,8 +52,8 @@ public class InwardRmt implements Serializable {
   @Column(name = "ccy", nullable=true)
   private String ccy;
 
-  @Column(name = "amt", nullable=true)
-  private BigDecimal amt;
+  @Column(name = "inst_amt", nullable=true)
+  private BigDecimal instAmt;
   
   @Column(name = "order_cust", nullable=true)
   private String orderCust;
@@ -63,6 +63,9 @@ public class InwardRmt implements Serializable {
   
   @Column(name = "benef_acct", nullable=true)
   private String benefAcct;
+  
+  @Column(name = "benef_name", nullable=true)
+  private String benefName;
 
   @Column(name = "sender_corr", nullable=true)
   private String senderCorr;
@@ -94,16 +97,16 @@ public class InwardRmt implements Serializable {
   @Column(name = "bank_info", nullable=true)
   private String bankInfo;
 
-  public void setAmt(BigDecimal amt) {
-    this.amt = amt;
+  public void setInstAmt(BigDecimal amt) {
+    this.instAmt = amt;
   }
   
-  public void setAmt(Integer amt) {
-    this.amt = BigDecimal.valueOf(amt);
+  public void setInstAmt(Integer amt) {
+    this.instAmt = BigDecimal.valueOf(amt);
   }
 
-  public void setAmt(Float amt) {
-    this.amt = BigDecimal.valueOf(amt);
+  public void setInstAmt(Float amt) {
+    this.instAmt = BigDecimal.valueOf(amt);
   }
     
   public void setSenderCharge(BigDecimal amt) {
@@ -128,6 +131,10 @@ public class InwardRmt implements Serializable {
 
   public void setReceiverCharge(Float amt) {
     this.receiverCharge = BigDecimal.valueOf(amt);
+  }
+  
+  public Boolean isVerifyDone() {
+    return this.verifyStatus == VerifyStatus.DONE;
   }
 
   @Override

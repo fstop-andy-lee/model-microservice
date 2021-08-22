@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
@@ -17,6 +18,8 @@ import tw.com.firstbank.adapter.gateway.AmlGateway;
 import tw.com.firstbank.entity.Bafotr;
 import tw.com.firstbank.entity.BankInfo;
 import tw.com.firstbank.entity.InwardRmt;
+import tw.com.firstbank.entity.Master;
+import tw.com.firstbank.entity.RmtAdvice;
 import tw.com.firstbank.entity.SwiftMessageLog;
 import tw.com.firstbank.model.SwiftMessage;
 import tw.com.firstbank.model.SwiftTask;
@@ -102,13 +105,20 @@ public class SwiftServiceImpl implements SwiftService {
     
     for(SwiftMessageLog msg : logs) {
       log.debug(msg.getMsg());
+
+      //TODO: 5 倍量的擴展方式: service? thread?
+      // 共用檔案均是 IO 瓶頸
+      // 但做 event sourcing 會複雜化      
        
       SwiftTask task = this.parseSwiftMessage(msg.getMsg());
+      
       // convert task to InwardRmt 
       List<InwardRmt> rmts = from103(msg.getId(), task);
       
       for(InwardRmt rmt : rmts) {
-        processInwardRmt(msg, rmt);
+        processInwardRmtThenAmlThenAdvice(msg, rmt);
+        
+        //processAmlThenInwardRmtThenAdvice(msg, rmt);
       }
       
     }
@@ -116,27 +126,91 @@ public class SwiftServiceImpl implements SwiftService {
     return logs.size();
   }
   
-  private void processInwardRmt(SwiftMessageLog msg, InwardRmt rmt) {
-    try {
-      
+  private void processInwardRmtThenAmlThenAdvice(SwiftMessageLog msg, InwardRmt rmt) {
+    
+    try {      
       // check corr
-      if (isValidReceiverCorr(rmt.getReceiverCorr())) {               
-        repoHelper.parseComplete(msg, rmt, addBafotr(rmt));
-      } else {
+      if (isValidReceiverCorr(rmt.getReceiverCorr()) == false) {               
         repoHelper.parsePending(msg);
+        return;
       }       
       
-      // check aml
-      // 是否應該取 CIF 的姓名?
-      if (amlGateway.screenByApi(rmt.getBenefCust()) > 0) {
-        log.debug("AML HIT");
-      } else {
-        log.debug("AML OK");
+      // 取姓名
+      Master master = repoHelper.findMasterByAcct(rmt.getBenefAcct());
+      if (master != null) {
+        rmt.setBenefName(master.getName());
       }
+            
+      repoHelper.parseComplete(msg, rmt, addBafotr(rmt));
+      
+      // check aml
+      if (amlGateway.screenByApi(rmt.getBenefName()) > 0) {
+        log.debug("AML HIT");
+        repoHelper.markVerifyPending(rmt);
+      } else {
+        log.debug("AML OK");                
+        repoHelper.markVerifyDone(rmt);
+        // print rmt advice & notice
+        printRmtAdvice(rmt);
+        // wating for payment
+        repoHelper.markPayment(rmt);
+      }
+      
+      //TODO: payment
       
     } catch(Exception e) {
       log.error(e.getMessage(), e);
     }
+  }
+  
+  @SuppressWarnings("unused")
+  private void processAmlThenInwardRmtThenAdvice(SwiftMessageLog msg, InwardRmt rmt) {
+    
+    try {      
+      // check corr
+      if (isValidReceiverCorr(rmt.getReceiverCorr()) == false) {               
+        repoHelper.parsePending(msg);
+        return;
+      }       
+      
+      // 取姓名
+      Master master = repoHelper.findMasterByAcct(rmt.getBenefAcct());
+      if (master != null) {
+        rmt.setBenefName(master.getName());
+      }
+      
+      // check aml
+      if (amlGateway.screenByApi(rmt.getBenefName()) > 0) {
+        log.debug("AML HIT");
+        repoHelper.markVerifyPending(rmt);
+      } else {
+        repoHelper.markVerifyDone(rmt);
+      }
+            
+      repoHelper.parseComplete(msg, rmt, addBafotr(rmt));
+      
+      if (rmt.isVerifyDone()) {
+        // print rmt advice & notice
+        printRmtAdvice(rmt);
+        // wating for payment
+        repoHelper.markPayment(rmt);
+         
+        //TODO: payment
+      }
+      
+      // 異常
+      
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+    }    
+  }
+  
+  private void printRmtAdvice(InwardRmt rmt) {
+    RmtAdvice advice = new RmtAdvice();
+    BeanUtils.copyProperties(rmt, advice);
+    
+    advice.setStatus(0);
+    repoHelper.saveRmtAdvice(advice);
   }
   
   private Bafotr addBafotr(InwardRmt rmt) {
@@ -145,7 +219,7 @@ public class SwiftServiceImpl implements SwiftService {
     
     ret.setBic(rmt.getReceiverCorr());
     ret.setCcy(rmt.getCcy());
-    ret.setCrAmt(rmt.getAmt());
+    ret.setCrAmt(rmt.getInstAmt());
     
     return ret;
   }
@@ -182,15 +256,14 @@ public class SwiftServiceImpl implements SwiftService {
         } else if (tagName.startsWith("32A")) {
           rmt.setValueDate(valueDateFrom32A(tagValue));
           rmt.setCcy(ccyFrom32A(tagValue));
-          rmt.setAmt(amtFrom32A(tagValue));          
+          rmt.setInstAmt(amtFrom32A(tagValue));          
         } else if (tagName.startsWith("50")) {
           // A, F, K
           rmt.setOrderCust(tagValue);
         } else if (tagName.startsWith("59")) {
           // 59, 59A, 59F
           rmt.setBenefCust(tagValue);
-          rmt.setBenefAcct(acctFromTag(tagValue));
-          
+          rmt.setBenefAcct(acctFromTag(tagValue));          
         } else if (tagName.startsWith("71A")) {
           rmt.setDetailCharge(tagValue);
         } else if (tagName.startsWith("53A")) { //-- optional

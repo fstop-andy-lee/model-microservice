@@ -4,6 +4,6 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 public interface AmlChannel {
   
-  @RabbitListener(queues = "amlQueue")  
+  //@RabbitListener(queues = "amlQueue")  
   public Integer screen(String name);
 }

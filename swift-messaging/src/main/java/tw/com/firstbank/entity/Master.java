@@ -18,7 +18,7 @@ import lombok.ToString;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(of = {"id", "holdMark", "balance", "status", "cif"})
+@ToString(of = {"id", "holdMark", "balance", "status", "name"})
 public class Master implements Serializable {
 
   private static final long serialVersionUID = -347185184625668388L;
@@ -36,8 +36,8 @@ public class Master implements Serializable {
   @Column(name = "status", nullable=true)
   private Integer status;
   
-  @Column(name = "cif", nullable=true)
-  private String cif;
+  @Column(name = "name", nullable=true)
+  private String name;
 
   public void setBalance(BigDecimal amt) {
     this.balance = amt;

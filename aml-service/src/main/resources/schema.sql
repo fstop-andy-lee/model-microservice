@@ -1,5 +1,12 @@
+---- PUBLIC
 drop table if exists black_list;
-create table black_list (
+
+---- AML
+drop schema if exists aml;
+create schema aml;
+
+drop table if exists aml.black_list;
+create table aml.black_list (
   id varchar(40) primary key,
   name  varchar(200),
   screen_type int default 0

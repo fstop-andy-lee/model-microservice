@@ -8,12 +8,18 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import tw.com.firstbank.domain.type.InwardRmtStatus;
 import tw.com.firstbank.domain.type.SwiftMessageStatus;
+import tw.com.firstbank.domain.type.VerifyStatus;
 import tw.com.firstbank.entity.Bafotr;
 import tw.com.firstbank.entity.InwardRmt;
+import tw.com.firstbank.entity.Master;
+import tw.com.firstbank.entity.RmtAdvice;
 import tw.com.firstbank.entity.SwiftMessageLog;
 import tw.com.firstbank.repository.BafotrRepository;
 import tw.com.firstbank.repository.InwardRmtRepository;
+import tw.com.firstbank.repository.MasterRepository;
+import tw.com.firstbank.repository.RmtAdviceRepository;
 import tw.com.firstbank.repository.SwiftMessageRepository;
 
 /**
@@ -23,6 +29,7 @@ import tw.com.firstbank.repository.SwiftMessageRepository;
  */
 @Service
 public class RepositoryHelperImpl implements RepositoryHelper {
+  
   @Autowired
   private SwiftMessageRepository swiftMsgRepo;
   
@@ -31,6 +38,12 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   
   @Autowired
   private BafotrRepository bafotrRepo;
+  
+  @Autowired
+  private RmtAdviceRepository rmtAdviceRepo;
+  
+  @Autowired
+  private MasterRepository masterRepo;
   
   private String generateId() {
     return UUID.randomUUID().toString();
@@ -59,7 +72,7 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     msgLog.setStatus(SwiftMessageStatus.DONE);
     swiftMsgRepo.save(msgLog);
   }
-  
+    
   public void saveBafotr(Bafotr otr) {
     bafotrRepo.save(otr);
   }
@@ -81,6 +94,25 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     saveBafotr(baf);
   }
   
+  public Master findMasterByAcct(String acct) {
+    return masterRepo.findById(acct).orElse(null);
+  }
+  
+  public void markVerifyPending(InwardRmt rmt) {
+    rmt.setVerifyStatus(VerifyStatus.PENDING);
+    saveInwardRmt(rmt);
+  }
+
+  public void markVerifyDone(InwardRmt rmt) {
+    rmt.setVerifyStatus(VerifyStatus.DONE);
+    saveInwardRmt(rmt);
+  }
+  
+  public void markPayment(InwardRmt rmt) {
+    rmt.setStatus(InwardRmtStatus.PAY);
+    saveInwardRmt(rmt);
+  }
+  
   @Transactional
   public void parseComplete(SwiftMessageLog msg, InwardRmt rmt, Bafotr otr) {
     saveInwardRmt(rmt);
@@ -91,6 +123,10 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   @Transactional
   public void parsePending(SwiftMessageLog msg) {
     markPending(msg);
+  }
+  
+  public void saveRmtAdvice(RmtAdvice advice) {
+    rmtAdviceRepo.save(advice);
   }
   
   public void saveInwardRmt(InwardRmt rmt) {
