@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<include resource="org/springframework/boot/logging/logback/base.xml" />
+    <property name="CHARSET" value="UTF-8" />
+    <property name="PATTERN" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg %n" />
+        
+    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+      <discriminator>
+        <key>userid</key>
+        <defaultValue>unknown</defaultValue>
+      </discriminator>
+      <sift>
+        <appender name="FILE-${userid}.log" class="ch.qos.logback.core.FileAppender">
+          <file>${userid}.log</file>
+          <append>false</append>
+          <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>${PATTERN}</pattern>
+            <charset>${CHARSET}</charset>
+          </layout>
+        </appender>
+      </sift>
+    </appender>
+    
+	<!-- 每日切換日誌文件 -->
+    <appender name="DRF" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>logs/app.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+          	<!--日誌文件輸出的文件名-->
+          	<FileNamePattern>logs/app.%d{yyyy-MM-dd}.log</FileNamePattern>
+          	<!--日誌文件保留天數-->
+          	<maxHistory>7</maxHistory>               	      
+        </rollingPolicy>
+        <encoder>
+          	<Pattern>${PATTERN}</Pattern>
+          	<charset>${CHARSET}</charset>
+        </encoder>   
+        
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+          	<MaxFileSize>100MB</MaxFileSize>
+        </triggeringPolicy>           
+    </appender>
+	
+	<root level="INFO">
+		<appender-ref ref="CONSOLE" />
+	</root>
+	
+	<logger name="tw.com.firstbank" level="DEBUG" additivity="false">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="DRF" />  
+	</logger>        
+	
+</configuration>

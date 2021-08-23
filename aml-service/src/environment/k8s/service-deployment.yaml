@@ -1,0 +1,116 @@
+## service deploy
+# kubectl delete -f service-deployment.yaml
+# minikube kubectl -- delete -f ./service-deployment.yaml
+
+# kubectl create -f service-deployment.yaml
+# minikube kubectl -- create -f ./service-deployment.yaml
+
+
+# create role to list service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+ name: list-service
+ namespace: default
+rules:
+# - apiGroups:
+#    - ''
+#   resources:
+#    - pods
+#   verbs:
+#    - list    
+  - apiGroups: [""]
+    resources: ["pods", "endpoints", "services", "configmaps"]
+    verbs: ["get", "watch", "list"]   
+---
+# create service account for app
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: app-user   
+ namespace: default
+---
+# binding role to service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+ name: list-service_app-user
+ namespace: default
+roleRef:
+ kind: ClusterRole
+ name: list-service
+ apiGroup: rbac.authorization.k8s.io
+subjects:
+ - kind: ServiceAccount
+   name: app-user
+   namespace: default
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aml-service
+data:
+  profile: develop
+  
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aml-service
+spec:
+  selector:
+    app: aml-service
+    
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8090
+      nodePort: 38090
+      
+  #type: LoadBalancer
+  #ports:
+  #  - name: http
+  #    port: 8888
+  #    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aml-service
+spec:
+  selector:
+      matchLabels:
+        app: aml-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: aml-service
+    spec:
+      # pod service account
+      serviceAccountName: app-user
+      containers:
+        - name: aml-service
+          image: andylee/aml-service:latest
+          imagePullPolicy: Always #IfNotPresent
+          args: ["--spring.config.location=/home/spring/app/conf/"]
+          ports:
+            - name: http
+              containerPort: 8090
+          env:
+            #- name: JAVA_OPTIONS
+            #  value: "-Dspring.profiles.active=${profile}"
+            #- name: ENVIRONMENT
+            #  valueFrom:
+            #    configMapKeyRef:
+            #      name: aml-service
+            #      key: profile    
+          
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                    name: aml-service
+                    key: profile
+            #- name: SPRING_CONFIG_LOCATION
+            #  value: "/home/spring/app/conf/"   
+                 
