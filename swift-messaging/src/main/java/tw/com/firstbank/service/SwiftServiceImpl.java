@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
@@ -14,13 +13,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
-import tw.com.firstbank.adapter.gateway.AmlGateway;
 import tw.com.firstbank.adapter.gateway.InwardRmtGateway;
-import tw.com.firstbank.entity.Bafotr;
 import tw.com.firstbank.entity.BankInfo;
-import tw.com.firstbank.entity.InwardRmt;
-import tw.com.firstbank.entity.Master;
-import tw.com.firstbank.entity.RmtAdvice;
 import tw.com.firstbank.entity.SwiftMessageLog;
 import tw.com.firstbank.model.InwardRmtDto;
 import tw.com.firstbank.model.SwiftMessage;
@@ -39,10 +33,7 @@ public class SwiftServiceImpl implements SwiftService {
   
   @Autowired
   private RepositoryHelper repoHelper;
-  
-  @Autowired
-  private AmlGateway amlGateway;
-  
+    
   @Autowired
   private InwardRmtGateway inwardRmtGateway;  
    
@@ -122,13 +113,6 @@ public class SwiftServiceImpl implements SwiftService {
         processInwardRmt(msg, rmt);
       }
       
-// convert task to InwardRmt 
-//      List<InwardRmt> rmts = from103(msg.getId(), task);      
-//      for(InwardRmt rmt : rmts) {        
-//        processInwardRmtThenAmlThenAdvice(msg, rmt);        
-//        processAmlThenInwardRmtThenAdvice(msg, rmt);
-//      }
-      
     }
         
     return logs.size();
@@ -154,107 +138,6 @@ public class SwiftServiceImpl implements SwiftService {
     } catch(Exception e) {
       log.error(e.getMessage(), e);
     }    
-  }
-  
-  @SuppressWarnings("unused")
-  private void processInwardRmtThenAmlThenAdvice(SwiftMessageLog msg, InwardRmt rmt) {
-    
-    try {      
-      // check corr
-      if (isValidReceiverCorr(rmt.getReceiverCorr()) == false) {               
-        repoHelper.parsePending(msg);
-        return;
-      }       
-      
-      // 取姓名
-      Master master = repoHelper.findMasterByAcct(rmt.getBenefAcct());
-      if (master != null) {
-        rmt.setBenefName(master.getName());
-      }
-            
-      repoHelper.parseComplete(msg, rmt, addBafotr(rmt));
-      
-      // check aml
-      if (amlGateway.screenByApi(rmt.getBenefName()) > 0) {
-        log.debug("AML HIT");
-        repoHelper.markVerifyPending(rmt);
-      } else {
-        log.debug("AML OK");                
-        repoHelper.markVerifyDone(rmt);
-        // print rmt advice & notice
-        printRmtAdvice(rmt);
-        // wating for payment
-        repoHelper.markPayment(rmt);
-        
-        repoHelper.payment(rmt);
-      }
-      
-      // 異常
-      
-    } catch(Exception e) {
-      log.error(e.getMessage(), e);
-    }
-  }
-  
-  @SuppressWarnings("unused")
-  private void processAmlThenInwardRmtThenAdvice(SwiftMessageLog msg, InwardRmt rmt) {
-    
-    try {      
-      // check corr
-      if (isValidReceiverCorr(rmt.getReceiverCorr()) == false) {               
-        repoHelper.parsePending(msg);
-        return;
-      }       
-      
-      // 取姓名
-      Master master = repoHelper.findMasterByAcct(rmt.getBenefAcct());
-      if (master != null) {
-        rmt.setBenefName(master.getName());
-      }
-      
-      // check aml
-      if (amlGateway.screenByApi(rmt.getBenefName()) > 0) {
-        log.debug("AML HIT");
-        repoHelper.markVerifyPending(rmt);
-      } else {
-        repoHelper.markVerifyDone(rmt);
-      }
-      
-      repoHelper.parseComplete(msg, rmt, addBafotr(rmt));
-            
-      if (rmt.isVerifyDone()) {
-        // print rmt advice & notice
-        printRmtAdvice(rmt);
-        // wating for payment
-        repoHelper.markPayment(rmt);
-         
-        repoHelper.payment(rmt);
-      }
-      
-      // 異常
-      
-    } catch(Exception e) {
-      log.error(e.getMessage(), e);
-    }    
-  }
-  
-  private void printRmtAdvice(InwardRmt rmt) {
-    RmtAdvice advice = new RmtAdvice();
-    BeanUtils.copyProperties(rmt, advice);
-    
-    advice.setStatus(0);
-    repoHelper.saveRmtAdvice(advice);
-  }
-  
-  private Bafotr addBafotr(InwardRmt rmt) {
-    Bafotr ret = null;
-    ret = new Bafotr();
-    
-    ret.setBic(rmt.getReceiverCorr());
-    ret.setCcy(rmt.getCcy());
-    ret.setCrAmt(rmt.getInstAmt());
-    
-    return ret;
   }
     
   private Boolean isValidReceiverCorr(String bic) {

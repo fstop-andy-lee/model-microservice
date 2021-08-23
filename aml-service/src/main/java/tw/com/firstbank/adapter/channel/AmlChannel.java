@@ -1,6 +1,6 @@
 package tw.com.firstbank.adapter.channel;
 
-import org.springframework.amqp.rabbit.annotation.RabbitListener;
+//import org.springframework.amqp.rabbit.annotation.RabbitListener;
 
 public interface AmlChannel {
   

@@ -27,8 +27,8 @@ public class AmqpConfig {
   private ConnectionFactory connectionFactory;
     
   @Bean
-  public Queue inwardRmtQueue() {
-    return new Queue(ChannelConstants.INWARD_RMT_REQ, false);
+  public Queue inwardRmtRepQueue() {
+    return new Queue(ChannelConstants.INWARD_RMT_REP, false);
   }
 
   @Bean

@@ -1,5 +1,5 @@
 FROM openjdk:8-jdk-alpine
-EXPOSE 8080
+EXPOSE 8090
 EXPOSE 9999
 
 # non root user

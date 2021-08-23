@@ -60,6 +60,8 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       if (amlGateway.screenByApi(rmt.getBenefName()) > 0) {
         log.debug("AML HIT");
         repoHelper.markVerifyPending(rmt);
+        
+        return 1;
       } else {
         log.debug("AML OK");                
         repoHelper.markVerifyDone(rmt);

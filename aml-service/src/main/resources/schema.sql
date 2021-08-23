@@ -1,8 +1,5 @@
----- PUBLIC
-drop table if exists black_list;
-
 ---- AML
-drop schema if exists aml;
+drop schema if exists aml CASCADE;
 create schema aml;
 
 drop table if exists aml.black_list;
