@@ -204,5 +204,6 @@
     <module>service3</module>
     <module>fx-common-module</module>
     <module>aml-service</module>
+    <module>inward-rmt-service</module>
   </modules>
 </project>

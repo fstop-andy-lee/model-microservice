@@ -1,6 +1,5 @@
 package tw.com.firstbank.service;
 
-import java.util.List;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.domain.type.InwardRmtStatus;
-import tw.com.firstbank.domain.type.SwiftMessageStatus;
 import tw.com.firstbank.domain.type.VerifyStatus;
 import tw.com.firstbank.entity.AcMr;
 import tw.com.firstbank.entity.Bafotr;
@@ -20,7 +18,6 @@ import tw.com.firstbank.entity.Position;
 import tw.com.firstbank.entity.RmtAdvice;
 import tw.com.firstbank.entity.RmtCbQta;
 import tw.com.firstbank.entity.RmtCbRpt3;
-import tw.com.firstbank.entity.SwiftMessageLog;
 import tw.com.firstbank.repository.AcMrRepository;
 import tw.com.firstbank.repository.BafotrRepository;
 import tw.com.firstbank.repository.InwardRmtRepository;
@@ -29,7 +26,6 @@ import tw.com.firstbank.repository.PositionRepository;
 import tw.com.firstbank.repository.RmtAdviceRepository;
 import tw.com.firstbank.repository.RmtCbQtaRepository;
 import tw.com.firstbank.repository.RmtCbRpt3Repository;
-import tw.com.firstbank.repository.SwiftMessageRepository;
 
 /**
  * Any self-invocation calls will not start any transaction
@@ -39,9 +35,6 @@ import tw.com.firstbank.repository.SwiftMessageRepository;
 @Slf4j
 @Service
 public class RepositoryHelperImpl implements RepositoryHelper {
-  
-  @Autowired
-  private SwiftMessageRepository swiftMsgRepo;
   
   @Autowired
   private InwardRmtRepository inwardRmtRepo;
@@ -71,30 +64,6 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     return UUID.randomUUID().toString();
   }
   
-  public List<SwiftMessageLog> findInactiveMsgs(Integer records) {
-    return swiftMsgRepo.findInactive(records);
-  }
-  
-  public String saveInactiveSwiftMessageLog(String content) {
-    String id = generateId();
-    SwiftMessageLog msgLog = new SwiftMessageLog();
-    msgLog.setId(id);
-    msgLog.setMsg(content);
-    msgLog.setStatus(SwiftMessageStatus.INACTIVE);
-    swiftMsgRepo.save(msgLog);
-    return id;
-  }
-  
-  public void markPending(SwiftMessageLog msgLog) {
-    msgLog.setStatus(SwiftMessageStatus.PENDING);
-    swiftMsgRepo.save(msgLog);
-  }
-  
-  public void markDone(SwiftMessageLog msgLog) {
-    msgLog.setStatus(SwiftMessageStatus.DONE);
-    swiftMsgRepo.save(msgLog);
-  }
-    
   public void saveBafotr(Bafotr otr) {
     bafotrRepo.save(otr);
   }
@@ -149,24 +118,13 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   }
   
   @Transactional
-  public void parseComplete(SwiftMessageLog msg) {
-    markDone(msg);
-  }
-  
-  @Transactional
-  public void parseComplete(SwiftMessageLog msg, InwardRmt rmt, Bafotr otr) {
+  public void parseComplete(InwardRmt rmt, Bafotr otr) {
     
-    // 匯入資料檔
+    // 1 匯入資料檔
     saveInwardRmt(rmt);
-    markDone(msg);
     
-    // 存同
+    // 2 存同
     addBafotr(otr);
-  }
-  
-  @Transactional
-  public void parsePending(SwiftMessageLog msg) {
-    markPending(msg);
   }
   
   @Transactional

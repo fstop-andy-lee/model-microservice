@@ -1,6 +1,6 @@
 server:
   address: 0.0.0.0
-  port: 8090
+  port: 8070
   servlet:
     contextPath: /
 
@@ -15,7 +15,7 @@ server:
 
 spring:
   application:
-    name: aml-service
+    name: inward-rmt
 
   ## enabling overriding by setting spring.main.allow-bean-definition-overriding=true
   main:
@@ -120,13 +120,7 @@ opentracing:
     const-sampler:
       decision: true
 
-#springfox:
-#  documentation:
-#    open-api:
-#      v3:
-#        path: /api-docs
-
 feature:
-  aml-service: true
+  inward-rmt: true
       
 

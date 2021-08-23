@@ -1,12 +1,12 @@
 ----
-/*
 insert into master (id, hold_mark, name, balance, unino) values
   ('62610123456', '', '帳號一', 0, 'A123456789'),
   ('69210111111', '', '帳號二', 0, 'A222222222'),
   ('69310000000', '', 'Bin', 0, 'A198765432');
-*/  
+  
 ----
-insert into swift.bank_info (id, bic, corr_flag) values
+/*
+insert into bank_info (id, bic, corr_flag) values
 ('PNBPUS3NNYC', 'PNBPUS3NNYC', true),
 ('PNBPUS33PHL', 'PNBPUS33PHL', true),
 ('MRMDUS33', 'MRMDUS33', true),
@@ -16,9 +16,10 @@ insert into swift.bank_info (id, bic, corr_flag) values
 ('BKTRUS33', 'BKTRUS33', true),
 ('IRVTUS3N', 'IRVTUS3N', false)
 ;
- 
+*/ 
 ----
-insert into swift.swift_message (id, status, msg) values  
+/*
+insert into swift_message (id, status, msg) values  
 ('1', 0,
 '{1:F01FCBKTWTPA6013193215992}
 {2:O1031144200521ROYCCAT2BXXX45332010912005220014N}
@@ -130,3 +131,4 @@ TAINAN
 '
 )
 ;
+*/

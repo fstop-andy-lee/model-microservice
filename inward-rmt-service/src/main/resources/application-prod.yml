@@ -7,7 +7,7 @@ spring:
       idleTimeout: 600000
       maxLifetime: 1800000
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://127.0.0.1/fxdb?currentSchema=public,swift
+    url: jdbc:postgresql://127.0.0.1/fxdb?currentSchema=public
     validationQuery: SELECT 1
     username: sa
     password: 123qwe
@@ -29,26 +29,3 @@ spring:
       ddl-auto: none
     database-platform: tw.com.firsbank.spring.dialect.PostgreSQL95JsonbDialect
     show-sql: true
-
-#  datasource:
-#    driverClassName: org.postgresql.Driver
-#    url: jdbc:postgresql://127.0.0.1/fxdb?currentSchema=public
-#    username: sa
-#    password: 123qwe
-
-#  datasource:
-#    # url: jdbc:h2:file:C:/temp/demo
-#    url: jdbc:h2:mem:testdb
-#    username: sa
-#    password:
-#    driver-class-name: org.h2.Driver
-#  jpa:
-#    database-platform: org.hibernate.dialect.H2Dialect
-#    hibernate:
-#      ddl-auto: create
-#      show_sql: true
-#      format_sql: true
-#    show-sql: true
-#  h2:
-#    console:
-#      enabled: true

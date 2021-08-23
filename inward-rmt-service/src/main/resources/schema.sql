@@ -1,31 +1,4 @@
-drop schema if exists swift CASCADE;
-create schema swift;
-
-
----- 銀行名錄檔
-drop table if exists swift.bank_info;
-create table swift.bank_info (
-  id  varchar(40) primary key,
-  bic varchar(11),   -- swift
-  iban varchar(34), --  International Bank Account Number (EUR)
-  aba_no varchar(9), -- American Ba​​nkers Association (US)
-  bsb_no varchar(6), -- Bank State Branch Number (AU)
-  name varchar(200),
-  addr varchar(500),
-  corr_flag boolean default false  
-);
-create unique index idx_bank_info_bic on swift.bank_info (bic);
-
----- 電文檔
-drop table if exists swift.swift_message;
-create table swift.swift_message (
-  id  varchar(40) primary key,
-  status int default 0,
-  msg varchar default null
-);
-
 ---- 帳號檔
-/*
 drop table if exists master;
 create table master (
   id  varchar(40) primary key,
@@ -35,9 +8,7 @@ create table master (
   name varchar(200),
   unino varchar(11)
 );
-*/
 ---- 匯入資料檔
-/*
 drop table if exists inward_rmt;
 create table inward_rmt (
   id varchar(40) primary key,
@@ -63,9 +34,7 @@ create table inward_rmt (
   acct_inst varchar(35),
   bank_info varchar(210) -- bank to bank
 );
-*/
 ---- 存同檔
-/*
 drop table if exists bafotr;
 create table bafotr (
   id varchar(40) primary key,  -- bank id : ccy
@@ -75,9 +44,8 @@ create table bafotr (
   db_amt decimal(13, 2),
   cr_amt decimal(13, 2)
 );  
-*/
+
 ---- 通知書檔
-/*
 drop table if exists rmt_advice;
 create table rmt_advice (
   id varchar(40) primary key,  -- our ref no
@@ -93,9 +61,8 @@ create table rmt_advice (
   rmt_info varchar(140),
   status int default 0 
 );  
-*/
+
 ---- 會計 
-/*
 drop table if exists acmr;
 create table acmr (
   id varchar(40) not null, -- acno
@@ -105,9 +72,8 @@ create table acmr (
   cr_amt decimal(13, 2),  
   primary key (id)
 );
-*/
+
 ---- 央行媒體申報檔
-/*
 drop table if exists rmt_cb_rpt3;
 create table rmt_cb_rpt3 (
   id serial not null, 
@@ -145,9 +111,8 @@ create table rmt_cb_rpt3 (
   data_source varchar(1) default 'M',  
   primary key (id)
 );
-*/
+
 ---- 央行額度通報檔
-/*
 drop table if exists rmt_cb_qta;
 create table rmt_cb_qta (
   id varchar(40) not null,
@@ -155,9 +120,8 @@ create table rmt_cb_qta (
   amt decimal(13, 2),
   primary key (id)
 );
-*/
+
 ---- 累計資金部位檔
-/*
 drop table if exists position;
 create table position (
   id varchar(40) not null,  -- ccy
@@ -166,7 +130,29 @@ create table position (
   net_amt decimal(13, 2),
   primary key (id)
 );
+
+---- 銀行名錄檔
+/*
+drop table if exists bank_info;
+create table bank_info (
+  id  varchar(40) primary key,
+  bic varchar(11),   -- swift
+  iban varchar(34), --  International Bank Account Number (EUR)
+  aba_no varchar(9), -- American Ba​​nkers Association (US)
+  bsb_no varchar(6), -- Bank State Branch Number (AU)
+  name varchar(200),
+  addr varchar(500),
+  corr_flag boolean default false  
+);
+create unique index idx_bank_info_bic on bank_info (bic);
 */
-
-
+---- 電文檔
+/*
+drop table if exists swift_message;
+create table swift_message (
+  id  varchar(40) primary key,
+  status int default 0,
+  msg varchar default null
+);
+*/
 

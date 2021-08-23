@@ -15,12 +15,14 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.adapter.gateway.AmlGateway;
+import tw.com.firstbank.adapter.gateway.InwardRmtGateway;
 import tw.com.firstbank.entity.Bafotr;
 import tw.com.firstbank.entity.BankInfo;
 import tw.com.firstbank.entity.InwardRmt;
 import tw.com.firstbank.entity.Master;
 import tw.com.firstbank.entity.RmtAdvice;
 import tw.com.firstbank.entity.SwiftMessageLog;
+import tw.com.firstbank.model.InwardRmtDto;
 import tw.com.firstbank.model.SwiftMessage;
 import tw.com.firstbank.model.SwiftTask;
 import tw.com.firstbank.model.SwiftTextTag;
@@ -40,6 +42,9 @@ public class SwiftServiceImpl implements SwiftService {
   
   @Autowired
   private AmlGateway amlGateway;
+  
+  @Autowired
+  private InwardRmtGateway inwardRmtGateway;  
    
   @Override
   public Integer uploadSwiftFiles(List<MultipartFile> files) throws IOException {
@@ -112,20 +117,43 @@ public class SwiftServiceImpl implements SwiftService {
        
       SwiftTask task = this.parseSwiftMessage(msg.getMsg());
       
-      // convert task to InwardRmt 
-      List<InwardRmt> rmts = from103(msg.getId(), task);
-      
-      for(InwardRmt rmt : rmts) {
-        processInwardRmtThenAmlThenAdvice(msg, rmt);
-        
-        //processAmlThenInwardRmtThenAdvice(msg, rmt);
+      List<InwardRmtDto> rmts = from103(msg.getId(), task);   
+      for(InwardRmtDto rmt : rmts) {
+        processInwardRmt(msg, rmt);
       }
+      
+// convert task to InwardRmt 
+//      List<InwardRmt> rmts = from103(msg.getId(), task);      
+//      for(InwardRmt rmt : rmts) {        
+//        processInwardRmtThenAmlThenAdvice(msg, rmt);        
+//        processAmlThenInwardRmtThenAdvice(msg, rmt);
+//      }
       
     }
         
     return logs.size();
   }
   
+  private void processInwardRmt(SwiftMessageLog msg, InwardRmtDto rmt) {
+    try {
+      // check corr
+      if (isValidReceiverCorr(rmt.getReceiverCorr()) == false) {               
+        repoHelper.parsePending(msg);
+        return;
+      }    
+      
+      Integer ret = inwardRmtGateway.processInwardRmtByEvent(rmt);
+      
+      if (ret > 0) {
+        repoHelper.parseComplete(msg);        
+      }
+      
+    } catch(Exception e) {
+      log.error(e.getMessage(), e);
+    }    
+  }
+  
+  @SuppressWarnings("unused")
   private void processInwardRmtThenAmlThenAdvice(SwiftMessageLog msg, InwardRmt rmt) {
     
     try {      
@@ -188,9 +216,9 @@ public class SwiftServiceImpl implements SwiftService {
       } else {
         repoHelper.markVerifyDone(rmt);
       }
-            
-      repoHelper.parseComplete(msg, rmt, addBafotr(rmt));
       
+      repoHelper.parseComplete(msg, rmt, addBafotr(rmt));
+            
       if (rmt.isVerifyDone()) {
         // print rmt advice & notice
         printRmtAdvice(rmt);
@@ -231,8 +259,8 @@ public class SwiftServiceImpl implements SwiftService {
     return opt.isPresent();
   }
   
-  private List<InwardRmt> from103(String taskId, SwiftTask task) {
-    List<InwardRmt> ret = new ArrayList<>();
+  private List<InwardRmtDto> from103(String taskId, SwiftTask task) {
+    List<InwardRmtDto> ret = new ArrayList<>();
     log.debug("msg cnt = {}", task.getMessages().size());
     
     for(SwiftMessage msg : task.getMessages()) {
@@ -241,7 +269,7 @@ public class SwiftServiceImpl implements SwiftService {
         continue;
       }
       
-      InwardRmt rmt = new InwardRmt();
+      InwardRmtDto rmt = new InwardRmtDto();
       
       log.debug("text cnt {}", msg.getTextBlock().count());
       for(SwiftTextTag tag : msg.getTextBlock().getTags()) {
