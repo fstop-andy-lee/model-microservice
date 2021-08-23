@@ -13,6 +13,8 @@ public interface RepositoryHelper {
   public String saveInactiveSwiftMessageLog(String content);
   public void markPending(SwiftMessageLog msgLog);
   public void markDone(SwiftMessageLog msgLog);  
+  public void markDone(String msgKey);
+  
   public void saveInwardRmt(InwardRmt rmt);
   public void saveRmtAdvice(RmtAdvice advice);
   public Master findMasterByAcct(String acct);

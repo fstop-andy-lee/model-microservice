@@ -60,6 +60,8 @@ public class InwardRmtDto implements Serializable {
   
   private String bankInfo;
   
+  private Integer replyStatus;
+  
   public void setInstAmt(BigDecimal amt) {
     this.instAmt = amt;
   }

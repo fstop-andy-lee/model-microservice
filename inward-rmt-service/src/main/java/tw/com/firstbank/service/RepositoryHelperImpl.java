@@ -1,7 +1,5 @@
 package tw.com.firstbank.service;
 
-import java.util.UUID;
-
 import javax.transaction.Transactional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,11 +57,7 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   
   @Autowired
   private PositionRepository positionRepo;  
-  
-  private String generateId() {
-    return UUID.randomUUID().toString();
-  }
-  
+    
   public void saveBafotr(Bafotr otr) {
     bafotrRepo.save(otr);
   }

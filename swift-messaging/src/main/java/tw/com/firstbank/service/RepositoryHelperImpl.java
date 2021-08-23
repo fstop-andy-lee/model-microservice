@@ -1,6 +1,7 @@
 package tw.com.firstbank.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.transaction.Transactional;
@@ -83,6 +84,12 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     msgLog.setStatus(SwiftMessageStatus.INACTIVE);
     swiftMsgRepo.save(msgLog);
     return id;
+  }
+  
+  public void markDone(String msgKey) {
+    Optional<SwiftMessageLog> opt = swiftMsgRepo.findById(msgKey);
+    SwiftMessageLog msgLog = opt.get();
+    markDone(msgLog);
   }
   
   public void markPending(SwiftMessageLog msgLog) {

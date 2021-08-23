@@ -32,7 +32,7 @@ devRun() {
    $TAG_NAME \
    --spring.config.location=$APP_HOME/conf/ \
    --server.port=8080 \
-   --spring.profiles.active=dev
+   --spring.profiles.active=develop
 }
 
 toDocker() {

@@ -142,11 +142,14 @@ public class SwiftServiceImpl implements SwiftService {
         return;
       }    
       
-      Integer ret = inwardRmtGateway.processInwardRmtByEvent(rmt);
-      
-      if (ret > 0) {
-        repoHelper.parseComplete(msg);        
-      }
+// sync
+//      InwardRmtDto ret = inwardRmtGateway.processInwardRmtByEvent(rmt);      
+//      if (ret.getReplyStatus() > 0) {
+//        repoHelper.parseComplete(msg);        
+//      }
+
+// async
+      inwardRmtGateway.processInwardRmtByAsyncEvent(rmt);
       
     } catch(Exception e) {
       log.error(e.getMessage(), e);

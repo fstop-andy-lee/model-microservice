@@ -12,3 +12,8 @@ docker run --rm --name postgres-db -e POSTGRES_DB=fx -e POSTGRES_USER=sa -e POST
 docker run -it --rm  postgres psql -U sa
 
 
+## Java 8
+
+sudo apt install openjdk-8-jdk openjdk-8-jre
+
+版本間切換: sudo update-alternatives --config java

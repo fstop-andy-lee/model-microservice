@@ -24,13 +24,15 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
   @Autowired
   private AmlGateway amlGateway;
   
-  public Integer processInwardRmt(InwardRmtDto dto) {
+  public InwardRmtDto processInwardRmt(InwardRmtDto dto) {
     Integer ret = 0;
     
     ret = processInwardRmtThenAmlThenAdvice(from(dto));
     //ret = processAmlThenInwardRmtThenAdvice(from(dto));
     
-    return ret;
+    dto.setReplyStatus(ret);
+    
+    return dto;
   }
   
   private InwardRmt from(InwardRmtDto src) {

@@ -1,24 +1,23 @@
 package tw.com.firstbank.spring.cfg;
 
 import org.springframework.amqp.core.Queue;
-//import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-//import org.springframework.amqp.rabbit.core.RabbitTemplate;
-//import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 
+import tw.com.firstbank.adapter.channel.ChannelConstants;
 import tw.com.firstbank.adapter.channel.LogMessageExceptionHandler;
 import tw.com.firstbank.adapter.channel.MessageExceptionHandler;
 
 @Configuration
 public class AmqpConfig {
-  
+    
   @Bean
-  public Queue inwardRmtQueue() {
-    return new Queue("inwardRmtQueue", false);
+  public Queue inwardRmtReqQueue() {
+    return new Queue(ChannelConstants.INWARD_RMT_REQ, false);
   }
-
+  
   @Bean
   @Order(1)
   public MessageExceptionHandler logMessageExceptionHandler() {
