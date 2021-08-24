@@ -126,6 +126,11 @@ spec:
             - name: http
               containerPort: 8080
           env:
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                    name: swift-messaging
+                    key: profile
             #- name: JAVA_OPTIONS
             #  value: "-Dspring.profiles.active=${profile}"
             #- name: ENVIRONMENT
@@ -134,13 +139,8 @@ spec:
             #      name: swift-messaging
             #      key: profile    
           
-            - name: SPRING_PROFILES_ACTIVE
-              valueFrom:
-                configMapKeyRef:
-                    name: swift-messaging
-                    key: profile
             #- name: SPRING_CONFIG_LOCATION
-            #  value: "/home/spring/app/conf/"   
+            #  value: "/home/spring/app/conf/"
           volumeMounts:
             - name: swift-messaging
               mountPath: /home/spring/app/conf/application-develop.yml
@@ -152,4 +152,5 @@ spec:
             items:
               - key: application-develop.yml
                 path: application-develop.yml
+
        
