@@ -6,7 +6,9 @@ create table master (
   balance decimal(18,2) ,
   status INT default 0,
   name varchar(200),
-  unino varchar(11)
+  unino varchar(11),
+  phone varchar(20),
+  addr varchar(200)  
 );
 ---- 匯入資料檔
 drop table if exists inward_rmt;
@@ -131,5 +133,22 @@ create table position (
   primary key (id)
 );
 
-
-
+---- 水單暨申報書檔
+drop table if exists billrpt;
+create table billrpt (
+  id varchar(40) not null,  
+  ccy varchar(3),
+  inst_amt decimal(13, 2),
+  benef_name varchar(200),
+  benef_acct varchar(35), -- A/C NO  
+  benef_cust varchar(140),
+  unino varchar(11),  
+  order_cust varchar(140),
+  order_bank varchar(140), 
+  addr varchar(200),
+  phone varchar(20),
+  rmt_type int default 0,
+  exchg_rate decimal(11, 8),
+  fee decimal(13, 2),  
+  primary key (id)
+);

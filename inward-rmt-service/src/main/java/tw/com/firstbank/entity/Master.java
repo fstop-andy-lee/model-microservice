@@ -42,6 +42,12 @@ public class Master implements Serializable {
   @Column(name = "unino", nullable=true)
   private String unino;
   
+  @Column(name = "phone", nullable=true)
+  private String phone;
+  
+  @Column(name = "addr", nullable=true)
+  private String addr;
+  
   public void setBalance(BigDecimal amt) {
     this.balance = amt;
   }

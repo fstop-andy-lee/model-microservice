@@ -1,5 +1,7 @@
 package tw.com.firstbank.service;
 
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,38 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     
     return dto;
   }
+  
+  public Integer processVerifiedInwardRmt() {
+    Integer ret = 0;
+    List<InwardRmt> rmts =  repoHelper.findVerifiedInwardRmt();
+    
+    for(InwardRmt rmt : rmts) {
+      // print rmt advice & notice
+      printRmtAdvice(rmt);
+      // wating for payment
+      repoHelper.markPayment(rmt);
+      
+      repoHelper.payment(rmt);
+      
+      repoHelper.billRpt(rmt);
+      ret++;
+    }
+    
+    return ret;    
+  }
+  
+  @Override
+  public Integer processVerifyPendingInwardRmt() {
+    Integer ret = 0;
+    List<InwardRmt> rmts =  repoHelper.findVerifyPendingInwardRmt();
+    for(InwardRmt rmt : rmts) {
+      repoHelper.markVerifyDone(rmt);
+      ret++;
+    }
+    return ret;
+  }
+  
+  
   
   private InwardRmt from(InwardRmtDto src) {
     InwardRmt target = new InwardRmt();
@@ -72,6 +106,8 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
         
         repoHelper.payment(rmt);
         
+        repoHelper.billRpt(rmt);
+        
         return 1;
       }
       
@@ -100,6 +136,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       if (amlGateway.screenByApi(rmt.getBenefName()) > 0) {
         log.debug("AML HIT");
         repoHelper.markVerifyPending(rmt);
+        return 1;
       } else {
         repoHelper.markVerifyDone(rmt);
       }
@@ -114,6 +151,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
          
         repoHelper.payment(rmt);
         
+        repoHelper.billRpt(rmt);
         return 1;
       }
       
@@ -144,5 +182,6 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     
     return ret;
   }
-  
+
+
 }

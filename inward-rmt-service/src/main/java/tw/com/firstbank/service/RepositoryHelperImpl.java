@@ -1,7 +1,11 @@
 package tw.com.firstbank.service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.util.List;
+
 import javax.transaction.Transactional;
 
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +14,7 @@ import tw.com.firstbank.domain.type.InwardRmtStatus;
 import tw.com.firstbank.domain.type.VerifyStatus;
 import tw.com.firstbank.entity.AcMr;
 import tw.com.firstbank.entity.Bafotr;
+import tw.com.firstbank.entity.BillRpt;
 import tw.com.firstbank.entity.InwardRmt;
 import tw.com.firstbank.entity.Master;
 import tw.com.firstbank.entity.Position;
@@ -18,6 +23,7 @@ import tw.com.firstbank.entity.RmtCbQta;
 import tw.com.firstbank.entity.RmtCbRpt3;
 import tw.com.firstbank.repository.AcMrRepository;
 import tw.com.firstbank.repository.BafotrRepository;
+import tw.com.firstbank.repository.BillRptRepository;
 import tw.com.firstbank.repository.InwardRmtRepository;
 import tw.com.firstbank.repository.MasterRepository;
 import tw.com.firstbank.repository.PositionRepository;
@@ -57,6 +63,10 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   
   @Autowired
   private PositionRepository positionRepo;  
+  
+  @Autowired
+  private BillRptRepository billRptRepo;  
+  
     
   public void saveBafotr(Bafotr otr) {
     bafotrRepo.save(otr);
@@ -90,6 +100,7 @@ public class RepositoryHelperImpl implements RepositoryHelper {
 
   public void markVerifyDone(InwardRmt rmt) {
     rmt.setVerifyStatus(VerifyStatus.DONE);
+    rmt.setStatus(InwardRmtStatus.PAY);
     saveInwardRmt(rmt);
   }
   
@@ -143,6 +154,40 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     markDone(rmt);
     
     //throw new IllegalStateException("Trigger tx rollback");
+  }
+  
+  @Transactional
+  public void billRpt(InwardRmt rmt) {    
+    Master master = findMasterByAcct(rmt.getBenefAcct());
+    if (master == null) {
+      log.error("Invalid acct {}", rmt.getBenefAcct());
+      throw new IllegalStateException();
+    }
+    
+    // 印水單、申報書        
+    try {
+      
+      BillRpt rpt = new BillRpt();
+      
+      rpt.setId(rmt.getId());
+      rpt.setBenefAcct(rmt.getBenefAcct());
+      rpt.setUnino(master.getUnino());
+      rpt.setAddr(master.getAddr());
+      rpt.setPhone(master.getPhone());
+      rpt.setBenefName(master.getName());
+      rpt.setBenefCust(rmt.getBenefCust());
+      rpt.setCcy(rmt.getCcy());
+      rpt.setInstAmt(rmt.getInstAmt());      
+      rpt.setFee(rmt.getReceiverCharge());      
+      rpt.setOrderCust(rmt.getOrderCust());
+      
+      log.debug("BILL {}", rpt.toString());
+      billRptRepo.save(rpt);
+      
+    } catch (Exception e) {
+      log.error(e.getMessage());
+    }
+    
   }
   
   public void creditAccount(InwardRmt rmt) {
@@ -228,6 +273,14 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     positionRepo.save(pos);
   }
   
+  public List<InwardRmt> findVerifyPendingInwardRmt() {
+    return inwardRmtRepo.findVerifyPending();
+  }
+  
+  public List<InwardRmt> findVerifiedInwardRmt() {
+    return inwardRmtRepo.findVerified();
+  }
+  
   private AcMr findAcMr(String acno) {
     AcMr ret = acmrRepo.findById(acno).orElse(null);;
     if (ret == null) {
@@ -236,5 +289,7 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     }    
     return ret;
   }
+  
+  
   
 }

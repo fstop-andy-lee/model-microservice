@@ -1,6 +1,8 @@
 package tw.com.firstbank.service;
 
 
+import java.util.List;
+
 import tw.com.firstbank.entity.Bafotr;
 import tw.com.firstbank.entity.InwardRmt;
 import tw.com.firstbank.entity.Master;
@@ -15,6 +17,9 @@ public interface RepositoryHelper {
   public void markVerifyDone(InwardRmt rmt);
   public void markPayment(InwardRmt rmt);
   
+  public List<InwardRmt> findVerifyPendingInwardRmt();
+  public List<InwardRmt> findVerifiedInwardRmt();
   public void parseComplete(InwardRmt rmt, Bafotr otr);
   public void payment(InwardRmt rmt);
+  public void billRpt(InwardRmt rmt);
 }
