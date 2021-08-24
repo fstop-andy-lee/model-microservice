@@ -50,7 +50,35 @@ kind: ConfigMap
 metadata:
   name: swift-messaging
 data:
-  profile: dev-k8s
+  profile: develop
+  application-develop.yml: |
+    spring:
+      datasource:
+        type: com.zaxxer.hikari.HikariDataSource
+        hikari:
+          connectionTimeout: 30000
+          idleTimeout: 600000
+          maxLifetime: 1800000
+        driver-class-name: org.postgresql.Driver
+        url: jdbc:postgresql://127.0.0.1/fxdb?currentSchema=public,swift
+        validationQuery: SELECT 1
+        username: sa
+        password: 123qwe
+        initialization-mode: always    
+      jpa:
+        properties:
+          hibernate:
+            # for lazy load no session exception
+            enable_lazy_load_no_trans: true
+            jdbc:
+              lob:
+                non_contextual_creation: true      
+          show_sql: true
+          format_sql: true
+          ddl-auto: none
+        database-platform: tw.com.firsbank.spring.dialect.PostgreSQL95JsonbDialect
+        show-sql: true
+
   
 ---
 apiVersion: v1
@@ -81,7 +109,7 @@ spec:
   selector:
       matchLabels:
         app: swift-messaging
-  replicas: 2
+  replicas: 1
   template:
     metadata:
       labels:
@@ -113,4 +141,15 @@ spec:
                     key: profile
             #- name: SPRING_CONFIG_LOCATION
             #  value: "/home/spring/app/conf/"   
-                 
+          volumeMounts:
+            - name: swift-messaging
+              mountPath: /home/spring/app/conf/application-develop.yml
+              subPath: application-develop.yml
+      volumes:
+        - name: swift-messaging
+          configMap:
+            name: swift-messaging
+            items:
+              - key: application-develop.yml
+                path: application-develop.yml
+       
