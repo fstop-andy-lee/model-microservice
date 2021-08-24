@@ -37,6 +37,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     return dto;
   }
   
+  // 放行
   public Integer processVerifiedInwardRmt() {
     Integer ret = 0;
     List<InwardRmt> rmts =  repoHelper.findVerifiedInwardRmt();
@@ -56,6 +57,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     return ret;    
   }
   
+  // 審核
   @Override
   public Integer processVerifyPendingInwardRmt() {
     Integer ret = 0;
@@ -66,8 +68,6 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     }
     return ret;
   }
-  
-  
   
   private InwardRmt from(InwardRmtDto src) {
     InwardRmt target = new InwardRmt();

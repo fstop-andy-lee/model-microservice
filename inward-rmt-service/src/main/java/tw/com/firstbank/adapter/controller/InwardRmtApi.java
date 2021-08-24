@@ -16,7 +16,7 @@ import io.swagger.annotations.ApiResponses;
 @Validated
 public interface InwardRmtApi {
   @ApiOperation(value = "",
-      notes = "Process Verified Pending Records.\n"
+      notes = "Process Verified Pending Records. 放行\n"
               + " \n")
       @ApiResponses(value = {
              @ApiResponse(code = 200, message = "SUCCESS")
@@ -33,7 +33,7 @@ public interface InwardRmtApi {
   ResponseEntity<Integer> verified();
   
   @ApiOperation(value = "",
-      notes = "Verify Pending Records.\n"
+      notes = "Verify Pending Records. 審核\n"
               + " \n")
       @ApiResponses(value = {
              @ApiResponse(code = 200, message = "SUCCESS")

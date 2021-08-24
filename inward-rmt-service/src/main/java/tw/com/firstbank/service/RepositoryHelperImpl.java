@@ -153,7 +153,9 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     // 6 匯入資料檔 I/O
     markDone(rmt);
     
-    //throw new IllegalStateException("Trigger tx rollback");
+    if ("NZD".equalsIgnoreCase(rmt.getCcy())) {
+      throw new IllegalStateException("Trigger tx rollback");      
+    }
   }
   
   @Transactional
