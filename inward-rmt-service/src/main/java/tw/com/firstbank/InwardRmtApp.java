@@ -8,6 +8,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableAsync;
 
 /**
  * For deploy to application server and running in stand alone mode, first the application entry
@@ -21,6 +22,7 @@ import org.springframework.core.env.Environment;
  * 
  */
 @SpringBootApplication
+@EnableAsync
 public class InwardRmtApp extends SpringBootServletInitializer {
   private static final Logger log = LoggerFactory.getLogger(InwardRmtApp.class);
 

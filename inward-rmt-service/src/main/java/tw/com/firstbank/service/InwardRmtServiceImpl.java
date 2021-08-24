@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,8 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     Integer ret = 0;
     
     ret = processInwardRmtThenAmlThenAdvice(from(dto));
+    
+    // 現場 live demo 情場一，配合案例三  
     //ret = processAmlThenInwardRmtThenAdvice(from(dto));
     
     dto.setReplyStatus(ret);
@@ -88,30 +91,23 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
         rmt.setBenefName(master.getName());
       }
             
-      repoHelper.parseComplete(rmt, addBafotr(rmt));
+      repoHelper.parseComplete(rmt, addBafotr(rmt));      
+      ret = 1;
       
       // check aml
       if (amlGateway.screenByApi(rmt.getBenefName()) > 0) {
         log.debug("AML HIT");
         repoHelper.markVerifyPending(rmt);
         
-        return 1;
+        return ret;
       } else {
-        log.debug("AML OK");                
-        repoHelper.markVerifyDone(rmt);
-        // print rmt advice & notice
-        printRmtAdvice(rmt);
-        // wating for payment
-        repoHelper.markPayment(rmt);
+        log.debug("AML OK");          
         
-        repoHelper.payment(rmt);
+        syncPayment(rmt);
+        //asyncPayment(rmt);
         
-        repoHelper.billRpt(rmt);
-        
-        return 1;
+        return ret;
       }
-      
-      // 異常
       
     } catch(Exception e) {
       log.error(e.getMessage(), e);
@@ -133,15 +129,20 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       }
       
       // check aml
-      if (amlGateway.screenByApi(rmt.getBenefName()) > 0) {
+      Integer amlStatus = amlGateway.screenByApi(rmt.getBenefName());
+      if (amlStatus > 0) {
         log.debug("AML HIT");
         repoHelper.markVerifyPending(rmt);
-        return 1;
       } else {
         repoHelper.markVerifyDone(rmt);
       }
             
       repoHelper.parseComplete(rmt, addBafotr(rmt));
+      ret = 1;
+
+      if (amlStatus > 0) {
+        return 1;
+      }      
       
       if (rmt.isVerifyDone()) {
         // print rmt advice & notice
@@ -152,7 +153,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
         repoHelper.payment(rmt);
         
         repoHelper.billRpt(rmt);
-        return 1;
+        return ret;
       }
       
       // 異常
@@ -162,6 +163,32 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     }    
     
     return ret;
+  }
+ 
+  @SuppressWarnings("unused")
+  private void syncPayment(InwardRmt rmt) {
+    repoHelper.markVerifyDone(rmt);
+    // print rmt advice & notice
+    printRmtAdvice(rmt);
+    // wating for payment
+    repoHelper.markPayment(rmt);
+    
+    repoHelper.payment(rmt);
+    
+    repoHelper.billRpt(rmt);
+  }
+  
+  @Async("threadPoolTaskExecutor")
+  private void asyncPayment(InwardRmt rmt) {    
+    repoHelper.markVerifyDone(rmt);
+    // print rmt advice & notice
+    printRmtAdvice(rmt);
+    // wating for payment
+    repoHelper.markPayment(rmt);
+    
+    repoHelper.payment(rmt);
+    
+    repoHelper.billRpt(rmt);
   }
   
   private void printRmtAdvice(InwardRmt rmt) {
