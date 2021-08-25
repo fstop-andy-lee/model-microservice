@@ -23,7 +23,7 @@ import tw.com.firstbank.domain.type.VerifyStatusConverter;
 @Getter
 @Setter
 @NoArgsConstructor
-@ToString(of = {"id", "status", "verifyStatus", "valueDate", "ccy", "instAmt", "benefCust"})
+@ToString(of = {"id", "status", "verifyStatus", "instAmt", "valueDate", "ccy", "benefCust"})
 public class InwardRmt implements Serializable {
 
   private static final long serialVersionUID = 3479500368711395238L;
@@ -53,7 +53,7 @@ public class InwardRmt implements Serializable {
   private String ccy;
 
   @Column(name = "inst_amt", nullable=true)
-  private BigDecimal instAmt;
+  private BigDecimal instAmt = BigDecimal.ZERO;
   
   @Column(name = "order_cust", nullable=true)
   private String orderCust;

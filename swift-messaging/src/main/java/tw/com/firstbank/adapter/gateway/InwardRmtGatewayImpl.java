@@ -4,8 +4,15 @@ import org.springframework.amqp.rabbit.AsyncRabbitTemplate;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFutureCallback;
+import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.adapter.channel.ChannelConstants;
@@ -27,8 +34,10 @@ public class InwardRmtGatewayImpl implements InwardRmtGateway, ListenableFutureC
   @Autowired
   private RepositoryHelper repoHelper;
   
-  @Value("${inward-rmt-url:http://localhost:8070/inward-rmt/v1/}")
+  @Value("${inward-rmt-url:http://localhost:8070/inward-rmt/v1/send}")
   private String url;
+  
+  private final ObjectMapper objectMapper = new ObjectMapper();
   
   @Override
   public InwardRmtDto processInwardRmtByEvent(InwardRmtDto dto) {
@@ -53,8 +62,26 @@ public class InwardRmtGatewayImpl implements InwardRmtGateway, ListenableFutureC
   
   @Override
   public InwardRmtDto processInwardRmtByApi(InwardRmtDto dto) {
-    // TBD
-    return null;
+    RestTemplate restTemplate = new RestTemplate();
+    HttpHeaders headers = new HttpHeaders();
+    headers.setContentType(MediaType.APPLICATION_JSON);
+    
+    String req = null;
+    try {
+      // convert for api call instAmt == null issue
+      dto.setApiInstAmt(dto.getInstAmt());
+      req = objectMapper.writeValueAsString(dto);
+    } catch (JsonProcessingException e) {
+      log.error("Convert json error ", e);
+      throw new IllegalStateException("Convert Fail"); 
+    }
+    log.debug("Req = {}", req);
+    HttpEntity<String> request = new HttpEntity<String>(req, headers);
+    
+    InwardRmtDto rep = restTemplate.postForObject(url, request, InwardRmtDto.class);
+    log.debug("Rep = {}", rep);
+    
+    return rep;
   }
 
   @Override

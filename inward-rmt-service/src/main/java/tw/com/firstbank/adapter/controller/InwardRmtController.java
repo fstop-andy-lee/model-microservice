@@ -1,6 +1,8 @@
 package tw.com.firstbank.adapter.controller;
 
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.annotation.WebAdapter;
+import tw.com.firstbank.model.InwardRmtDto;
 import tw.com.firstbank.service.InwardRmtService;
 
 @Slf4j
@@ -52,6 +55,20 @@ public class InwardRmtController implements InwardRmtApi {
       log.error(e.getMessage(), e);
     }
     return new ResponseEntity<Integer>(ret, HttpStatus.OK);
+  }
+
+  @Override
+  public ResponseEntity<InwardRmtDto> send(@Valid InwardRmtDto body) {
+    InwardRmtDto ret = null;
+    try {
+      body.setInstAmt(body.getApiInstAmt());
+      log.debug("AMT={}", body.getInstAmt());
+      ret = inwardRmtService.processInwardRmt(body);      
+      return new ResponseEntity<>(ret, HttpStatus.OK);
+    } catch(Exception e) {
+      log.error(e.getMessage());
+    }
+    return new ResponseEntity<>(ret, HttpStatus.BAD_REQUEST);
   }
 
 }

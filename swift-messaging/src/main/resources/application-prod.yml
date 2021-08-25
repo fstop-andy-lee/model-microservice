@@ -29,3 +29,8 @@ spring:
       ddl-auto: none
     database-platform: tw.com.firsbank.spring.dialect.PostgreSQL95JsonbDialect
     show-sql: true
+
+inward-rmt-url: http://localhost:8070/inward-rmt/v1/send
+
+# 0=asyncQ, 1=syncQ, 2=api
+process-type: 0 

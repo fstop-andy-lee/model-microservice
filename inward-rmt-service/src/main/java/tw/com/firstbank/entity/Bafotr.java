@@ -39,11 +39,11 @@ public class Bafotr implements Serializable {
   
   // -
   @Column(name = "db_amt", nullable=true)
-  private BigDecimal dbAmt;
+  private BigDecimal dbAmt = BigDecimal.ZERO;
   
   // +
   @Column(name = "cr_amt", nullable=true)
-  private BigDecimal crAmt;
+  private BigDecimal crAmt = BigDecimal.ZERO;
   
   public void setDbAmt(BigDecimal amt) {
     this.dbAmt = amt;

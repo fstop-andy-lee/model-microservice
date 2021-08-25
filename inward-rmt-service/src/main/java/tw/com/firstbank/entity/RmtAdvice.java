@@ -32,14 +32,14 @@ public class RmtAdvice implements Serializable {
   
   // 轉換金額
   @Column(name = "amt", nullable=true)
-  private BigDecimal amt;
+  private BigDecimal amt = BigDecimal.ZERO;
 
   @Column(name = "ccy", nullable=true)
   private String ccy;
   
   // 匯款金額
   @Column(name = "inst_amt", nullable=true)
-  private BigDecimal instAmt;
+  private BigDecimal instAmt = BigDecimal.ZERO;
 
   @Column(name = "benef_name", nullable=true)
   private String benefName;

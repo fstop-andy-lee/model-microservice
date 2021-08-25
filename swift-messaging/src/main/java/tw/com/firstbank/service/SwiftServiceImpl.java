@@ -7,7 +7,7 @@ import java.util.Optional;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,7 +36,11 @@ public class SwiftServiceImpl implements SwiftService {
     
   @Autowired
   private InwardRmtGateway inwardRmtGateway;  
-   
+
+  @Value("${process-type:0}")
+  private Integer processType;
+
+  
   @Override
   public Integer uploadSwiftFiles(List<MultipartFile> files) throws IOException {
     Integer ret = 0;
@@ -92,7 +96,7 @@ public class SwiftServiceImpl implements SwiftService {
     
     return ret;
   }
-
+  
   @Override
   public Integer send(Integer records) {
     List<SwiftMessageLog> logs = repoHelper.findInactiveMsgs(records);
@@ -124,16 +128,26 @@ public class SwiftServiceImpl implements SwiftService {
       if (isValidReceiverCorr(rmt.getReceiverCorr()) == false) {               
         repoHelper.parsePending(msg);
         return;
-      }    
+      }
       
-// sync
-//      InwardRmtDto ret = inwardRmtGateway.processInwardRmtByEvent(rmt);      
-//      if (ret.getReplyStatus() > 0) {
-//        repoHelper.parseComplete(msg);        
-//      }
-
-// async
-      inwardRmtGateway.processInwardRmtByAsyncEvent(rmt);
+      log.debug("process type = {}", processType);
+      
+      if (processType == 0) {
+        // async
+        inwardRmtGateway.processInwardRmtByAsyncEvent(rmt);        
+      } else if (processType == 1) {
+        // sync
+        InwardRmtDto ret = inwardRmtGateway.processInwardRmtByEvent(rmt);      
+        if (ret.getReplyStatus() > 0) {
+          repoHelper.parseComplete(msg);        
+        }        
+      } else {
+        // api      
+        InwardRmtDto ret = inwardRmtGateway.processInwardRmtByApi(rmt);
+        if (ret != null && ret.getReplyStatus() > 0) {
+          repoHelper.parseComplete(msg);        
+        }        
+      }
       
     } catch(Exception e) {
       log.error(e.getMessage(), e);
