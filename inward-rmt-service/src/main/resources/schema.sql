@@ -120,6 +120,7 @@ create table rmt_cb_qta (
   id varchar(40) not null,
   unino varchar(11),
   amt decimal(13, 2),
+  create_time timestamp NULL DEFAULT now(),
   primary key (id)
 );
 

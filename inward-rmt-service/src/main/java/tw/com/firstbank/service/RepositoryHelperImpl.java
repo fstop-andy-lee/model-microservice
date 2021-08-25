@@ -1,5 +1,6 @@
 package tw.com.firstbank.service;
 
+import java.time.Instant;
 import java.util.List;
 
 import javax.transaction.Transactional;
@@ -259,6 +260,8 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     
     Master master = findMasterByAcct(rmt.getBenefAcct());
     qta.setUnino(master.getUnino());
+    
+    qta.setCreateTime(Instant.now());
     
     rmtCbQtaRepo.save(qta);
   }

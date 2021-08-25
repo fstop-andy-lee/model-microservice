@@ -1,6 +1,7 @@
 package tw.com.firstbank.entity;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,6 +30,9 @@ public class RmtCbQta {
   
   @Column(name = "amt", nullable=true)
   private BigDecimal amt = BigDecimal.ZERO;
+  
+  @Column(name = "create_time")
+  private Instant createTime;
   
   public void setAmt(BigDecimal amt) {
     this.amt = amt;
