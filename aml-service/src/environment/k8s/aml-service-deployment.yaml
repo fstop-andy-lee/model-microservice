@@ -1,0 +1,155 @@
+## service deploy
+# kubectl delete -f service-deployment.yaml
+# minikube kubectl -- delete -f ./service-deployment.yaml
+
+# kubectl create -f service-deployment.yaml
+# minikube kubectl -- create -f ./service-deployment.yaml
+
+
+# create role to list service
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+ name: list-service
+ namespace: default
+rules:
+# - apiGroups:
+#    - ''
+#   resources:
+#    - pods
+#   verbs:
+#    - list    
+  - apiGroups: [""]
+    resources: ["pods", "endpoints", "services", "configmaps"]
+    verbs: ["get", "watch", "list"]   
+---
+# create service account for app
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+ name: app-user   
+ namespace: default
+---
+# binding role to service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+ name: list-service_app-user
+ namespace: default
+roleRef:
+ kind: ClusterRole
+ name: list-service
+ apiGroup: rbac.authorization.k8s.io
+subjects:
+ - kind: ServiceAccount
+   name: app-user
+   namespace: default
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: aml-service
+data:
+  profile: develop
+  application-develop.yml: |
+    spring:
+      datasource:
+        type: com.zaxxer.hikari.HikariDataSource
+        hikari:
+          connectionTimeout: 30000
+          idleTimeout: 600000
+          maxLifetime: 1800000
+        driver-class-name: org.postgresql.Driver
+        url: jdbc:postgresql://192.168.99.1:15432/fxdb?currentSchema=public,aml
+        validationQuery: SELECT 1
+        username: sa
+        password: 123qwe
+        initialization-mode: always    
+      jpa:
+        properties:
+          hibernate:
+            # for lazy load no session exception
+            enable_lazy_load_no_trans: true
+            jdbc:
+              lob:
+                non_contextual_creation: true      
+          show_sql: true
+          format_sql: true
+          ddl-auto: none
+        database-platform: tw.com.firsbank.spring.dialect.PostgreSQL95JsonbDialect
+        show-sql: true   
+    opentracing:
+      jaeger:
+        enabled: true
+        log-spans: true  
+        service-name: ${spring.application.name}
+        udp-sender:
+          host: 10.106.220.158
+          port: 6831
+        const-sampler:
+          decision: true
+          
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: aml-service
+spec:
+  selector:
+    app: aml-service
+    
+  type: NodePort
+  ports:
+    - protocol: TCP
+      port: 8090
+      nodePort: 32090
+      
+  #type: LoadBalancer
+  #ports:
+  #  - name: http
+  #    port: 8888
+  #    targetPort: 8080
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aml-service
+spec:
+  selector:
+      matchLabels:
+        app: aml-service
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: aml-service
+    spec:
+      # pod service account
+      serviceAccountName: app-user
+      containers:
+        - name: aml-service
+          image: andylee1973/aml-service:latest
+          imagePullPolicy: Always #IfNotPresent
+          args: ["--spring.config.location=/home/spring/app/conf/"]
+          ports:
+            - name: http
+              containerPort: 8090
+          env:            
+            - name: SPRING_PROFILES_ACTIVE
+              valueFrom:
+                configMapKeyRef:
+                    name: aml-service
+                    key: profile
+            - name: JAEGER_AGENT_PORT
+              value: "6831"
+          volumeMounts:
+            - name: aml-service
+              mountPath: /home/spring/app/conf/application-develop.yml
+              subPath: application-develop.yml
+      volumes:
+        - name: aml-service
+          configMap:
+            name: aml-service
+            items:
+              - key: application-develop.yml
+                path: application-develop.yml
