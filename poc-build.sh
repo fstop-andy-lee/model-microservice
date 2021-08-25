@@ -12,6 +12,8 @@ mkdir -p $BUILD_HOME
 
 cd $BUILD_HOME
 
+rm -rf $BUILD_HOME/$PRJ_HOME > /dev/null 2>&1
+
 git clone $GIT_URL
 
 cd $PRJ_HOME
