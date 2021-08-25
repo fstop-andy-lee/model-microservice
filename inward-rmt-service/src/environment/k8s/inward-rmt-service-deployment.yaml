@@ -64,7 +64,7 @@ data:
         validationQuery: SELECT 1
         username: sa
         password: 123qwe
-        initialization-mode: always    
+        #initialization-mode: always    
       jpa:
         properties:
           hibernate:
@@ -144,6 +144,13 @@ spec:
       matchLabels:
         app: inward-rmt-service
   replicas: 1
+  revisionHistoryLimit: 3
+  progressDeadlineSeconds: 600
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
   template:
     metadata:
       labels:

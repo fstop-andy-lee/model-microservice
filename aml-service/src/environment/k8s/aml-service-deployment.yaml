@@ -64,7 +64,7 @@ data:
         validationQuery: SELECT 1
         username: sa
         password: 123qwe
-        initialization-mode: always    
+        #initialization-mode: always    
       jpa:
         properties:
           hibernate:
