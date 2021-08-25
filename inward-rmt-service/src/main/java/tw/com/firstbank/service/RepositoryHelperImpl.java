@@ -151,9 +151,9 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     // 6 匯入資料檔 I/O
     markDone(rmt);
     
-    //if ("NZD".equalsIgnoreCase(rmt.getCcy())) {
-    //  throw new IllegalStateException("Trigger tx rollback");      
-    //}
+    if ("NZD".equalsIgnoreCase(rmt.getCcy())) {
+      throw new IllegalStateException("Trigger tx rollback");      
+    }
   }
   
   @Transactional
@@ -264,8 +264,13 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   }
   
   public void creditPosition(InwardRmt rmt) {
-    Position pos = new Position();
-    pos.setId(rmt.getCcy());
+    Position pos = positionRepo.findById(rmt.getCcy()).orElse(null);
+    
+    if (pos == null) {
+      pos = new Position();
+      pos.setId(rmt.getCcy());
+    } 
+    
     pos.setCrAmt(pos.getCrAmt().add(rmt.getInstAmt()));
     
     pos.setNetAmt(pos.getCrAmt().subtract(pos.getDbAmt()));
