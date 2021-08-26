@@ -1,6 +1,9 @@
 package tw.com.firstbank.service;
 
+import org.junit.Assert;
+import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
@@ -15,5 +18,14 @@ import tw.com.firstbank.SwiftMessagingApp;
 @ActiveProfiles("develop")
 @Sql({"/schema.sql", "/data.sql"})
 public class SwiftServiceTest {
+  
+  @Autowired
+  private SwiftService service;
+  
+  @Test
+  public void testService() {
+    Integer ret = service.send(5);
+    Assert.assertTrue(ret == 5);
+  }
 
 }
