@@ -34,6 +34,9 @@ public class InwardRmtGatewayImpl implements InwardRmtGateway, ListenableFutureC
   @Autowired
   private RepositoryHelper repoHelper;
   
+  @Autowired
+  private RestTemplate restTemplate;
+  
   @Value("${inward-rmt-url:http://localhost:8070/inward-rmt/v1/send}")
   private String url;
   
@@ -62,7 +65,7 @@ public class InwardRmtGatewayImpl implements InwardRmtGateway, ListenableFutureC
   
   @Override
   public InwardRmtDto processInwardRmtByApi(InwardRmtDto dto) {
-    RestTemplate restTemplate = new RestTemplate();
+    //RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     

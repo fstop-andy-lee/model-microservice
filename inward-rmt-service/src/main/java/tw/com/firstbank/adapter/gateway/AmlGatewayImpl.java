@@ -15,6 +15,9 @@ public class AmlGatewayImpl implements AmlGateway{
   @Autowired
   private RabbitTemplate rabbitTemplate;
   
+  @Autowired
+  private RestTemplate restTemplate;
+  
   @Value("${aml-url:http://localhost:8090/aml/v1/screen}")
   private String amlUrl;
   
@@ -33,7 +36,7 @@ public class AmlGatewayImpl implements AmlGateway{
   }
   
   public Integer screenByApi(String name) {
-    RestTemplate restTemplate = new RestTemplate();
+    //RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<Integer> ret = restTemplate.getForEntity(amlUrl + "?name=" + name, Integer.class);
     return ret.getBody();
   }
