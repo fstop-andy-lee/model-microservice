@@ -65,7 +65,6 @@ public class InwardRmtGatewayImpl implements InwardRmtGateway, ListenableFutureC
   
   @Override
   public InwardRmtDto processInwardRmtByApi(InwardRmtDto dto) {
-    //RestTemplate restTemplate = new RestTemplate();
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);
     

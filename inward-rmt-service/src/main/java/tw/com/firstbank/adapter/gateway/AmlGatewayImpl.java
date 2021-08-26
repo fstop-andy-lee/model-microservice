@@ -36,7 +36,6 @@ public class AmlGatewayImpl implements AmlGateway{
   }
   
   public Integer screenByApi(String name) {
-    //RestTemplate restTemplate = new RestTemplate();
     ResponseEntity<Integer> ret = restTemplate.getForEntity(amlUrl + "?name=" + name, Integer.class);
     return ret.getBody();
   }
