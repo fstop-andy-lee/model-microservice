@@ -110,9 +110,6 @@ public class InwardRmtServiceTest {
     
     dto = generateDto();
     dto.setInstAmt(123);
-    
-    System.out.println(">>>" + dto.toString());
-    
     dto = service.processInwardRmt(dto);     
     
     Assert.assertTrue(dto.getReplyStatus() == 1);
@@ -127,13 +124,9 @@ public class InwardRmtServiceTest {
     
     dto = generateDto();
     dto.setInstAmt(123);
-    
-    System.out.println(">>>" + dto.toString());
-    
     dto = service.processInwardRmt(dto);     
     
-    Assert.assertTrue(dto.getReplyStatus() == 1);
-    
+    Assert.assertTrue(dto.getReplyStatus() == 1);    
     Assert.assertTrue(repoHelper.findVerifyPendingInwardRmt().size() > 0);
   }
 
@@ -149,7 +142,6 @@ public class InwardRmtServiceTest {
     dto.setBenefCust("/62610123456 " + StringUtils.repeat("A", 40));
     dto = service.processInwardRmt(dto);    
     Assert.assertTrue(dto.getReplyStatus() == 0);
-   
   }
   
   // 案例五電文-解款異常
