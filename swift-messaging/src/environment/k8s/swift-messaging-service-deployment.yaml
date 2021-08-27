@@ -60,7 +60,7 @@ data:
           idleTimeout: 600000
           maxLifetime: 1800000
         driver-class-name: org.postgresql.Driver
-        url: jdbc:postgresql://192.168.99.1:15432/fxdb?currentSchema=public,swift
+        url: jdbc:postgresql://10.9.46.224:5432/fxdb?currentSchema=public,swift
         validationQuery: SELECT 1
         username: sa
         password: 123qwe
@@ -79,13 +79,13 @@ data:
         database-platform: tw.com.firsbank.spring.dialect.PostgreSQL95JsonbDialect
         show-sql: true
       rabbitmq:
-       addresses: 10.108.89.171:5672
-       adminAddresses: http://10.108.89.171:15672
-       nodes: rabbit@10.108.89.171
+       addresses: 10.102.89.25:5672
+       adminAddresses: http://10.102.89.25:5672
+       nodes: rabbit@10.102.89.25
        #username: guest
        #password: guest
-       username: andy
-       password: password
+       username: user
+       password: Zy9DLrNXgd
        virtual-host: /
        useSSL: false
        sslProperties:
@@ -108,14 +108,32 @@ data:
         log-spans: true  
         service-name: ${spring.application.name}
         udp-sender:
-          host: 10.106.220.158
+          host: 10.108.123.24
           port: 6831
         const-sampler:
           decision: true
-    inward-rmt-url: http://localhost:8070/inward-rmt/v1/send
+    inward-rmt-url: http://fx.fsb.lab/inward-rmt/v1/send
     # 0=asyncQ, 1=syncQ, 2=api
     process-type: 0    
-  
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: swift-messaging
+  labels:
+    app: swift-messaging
+spec:
+  rules:
+    - host: swift.fsb.lab
+      http:
+        paths: 
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: swift-messaging
+                port: 
+                  number: 8080            
 ---
 apiVersion: v1
 kind: Service
@@ -125,11 +143,12 @@ spec:
   selector:
     app: swift-messaging
     
-  type: NodePort
+  #type: NodePort
   ports:
     - protocol: TCP
       port: 8080
-      nodePort: 30082
+      #nodePort: 30082
+      targetPort: 8080
       
   #type: LoadBalancer
   #ports:

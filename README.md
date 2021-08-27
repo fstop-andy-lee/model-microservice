@@ -17,3 +17,8 @@ docker run -it --rm  postgres psql -U sa
 sudo apt install openjdk-8-jdk openjdk-8-jre
 
 版本間切換: sudo update-alternatives --config java
+
+## Maven
+
+sudo apt install maven
+

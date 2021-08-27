@@ -60,7 +60,7 @@ data:
           idleTimeout: 600000
           maxLifetime: 1800000
         driver-class-name: org.postgresql.Driver
-        url: jdbc:postgresql://192.168.99.1:15432/fxdb?currentSchema=public,aml
+        url: jdbc:postgresql://10.9.46.224:5432/fxdb?currentSchema=public,aml
         validationQuery: SELECT 1
         username: sa
         password: 123qwe
@@ -84,11 +84,29 @@ data:
         log-spans: true  
         service-name: ${spring.application.name}
         udp-sender:
-          host: 10.106.220.158
+          host: 10.108.123.24
           port: 6831
         const-sampler:
           decision: true
-          
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: aml-service
+  labels:
+    app: aml-service
+spec:
+  rules:
+    - host: aml.fsb.lab
+      http:
+        paths: 
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: aml-service
+                port: 
+                  number: 8090          
 ---
 apiVersion: v1
 kind: Service
@@ -97,12 +115,12 @@ metadata:
 spec:
   selector:
     app: aml-service
-    
-  type: NodePort
+  #type: NodePort
   ports:
-    - protocol: TCP
+    - protocol: TCP      
       port: 8090
-      nodePort: 32090
+      #nodePort: 32090
+      targetPort: 8090
       
   #type: LoadBalancer
   #ports:
