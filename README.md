@@ -22,3 +22,6 @@ sudo apt install openjdk-8-jdk openjdk-8-jre
 
 sudo apt install maven
 
+## Unit Test
+
+mvn -Dtest=InwardRmtApp -DfailIfNoTests=false test

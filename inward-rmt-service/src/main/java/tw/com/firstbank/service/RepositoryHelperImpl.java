@@ -155,6 +155,10 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     if ("NZD".equalsIgnoreCase(rmt.getCcy())) {
       throw new IllegalStateException("Trigger tx rollback");      
     }
+    
+    for(int i=0; i<10000; i++) {
+      // no op
+    }
   }
   
   @Transactional
