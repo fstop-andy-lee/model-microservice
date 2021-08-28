@@ -157,7 +157,7 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     }
     
     for(int i=0; i<5000000; i++) {
-      Math.sqrt(12345678);
+      Math.sqrt(12345678+i);
     }
   }
   
