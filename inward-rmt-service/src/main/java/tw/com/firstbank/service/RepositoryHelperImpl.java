@@ -156,7 +156,7 @@ public class RepositoryHelperImpl implements RepositoryHelper {
       throw new IllegalStateException("Trigger tx rollback");      
     }
     
-    for(int i=0; i<10000; i++) {
+    for(int i=0; i<500000; i++) {
       // no op
     }
   }
