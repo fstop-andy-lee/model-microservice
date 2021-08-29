@@ -117,6 +117,8 @@ jasypt:
 opentracing:
   spring:
     cloud:
+      jdbc:
+        enabled: false
       log:
         enabled: true
   jaeger:
