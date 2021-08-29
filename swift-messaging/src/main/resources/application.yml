@@ -21,6 +21,13 @@ spring:
   main:
     allow-bean-definition-overriding: true
 
+  ## Spring Boot 2.3 moving to bootstrapping Hibernate asynchronously by default.
+  ## Application stuck / hang on startup when using spring-cloud-starter!
+  data:
+    jpa:
+      repositories:
+        bootstrap_mode: default  
+
   jpa:
     properties:
       hibernate:
