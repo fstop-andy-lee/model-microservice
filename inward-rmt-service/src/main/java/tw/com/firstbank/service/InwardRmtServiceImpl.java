@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import io.opentracing.Span;
+import io.opentracing.util.GlobalTracer;
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.adapter.channel.InwardRmtChannel;
 import tw.com.firstbank.adapter.gateway.AmlGateway;
@@ -83,6 +85,8 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
   
   private Integer processInwardRmtThenAmlThenAdvice(InwardRmt rmt) {
     log.debug("processInwardRmtThenAmlThenAdvice");
+    Span sp = startLog("processInwardRmtThenAmlThenAdvice");
+    
     Integer ret = 0;
     try {
       
@@ -98,12 +102,13 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       // check aml
       if (amlGateway.screenByApi(rmt.getBenefName()) > 0) {
         log.debug("AML HIT");
+        writeLog(sp, "AML HIT");
         repoHelper.markVerifyPending(rmt);
         
         return ret;
       } else {
         log.debug("AML OK");          
-        
+        writeLog(sp, "AML OK");
         syncPayment(rmt);
         //asyncPayment(rmt);
         
@@ -112,7 +117,10 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       
     } catch(Exception e) {
       log.error(e.getMessage(), e);
-    }    
+      writeLog(sp, e.getMessage());
+    } finally {
+        endLog(sp);
+    }
     
     return ret;
   }
@@ -120,6 +128,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
   @SuppressWarnings("unused")
   private Integer processAmlThenInwardRmtThenAdvice(InwardRmt rmt) {
     log.debug("processAmlThenInwardRmtThenAdvice");
+    Span sp = startLog("processInwardRmtThenAmlThenAdvice");
     Integer ret = 0;
     try {      
       
@@ -134,6 +143,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       Integer amlStatus = amlGateway.screenByApi(rmt.getBenefName());
       if (amlStatus > 0) {
         log.debug("AML HIT");
+        writeLog(sp, "AML HIT");
         repoHelper.markVerifyPending(rmt);
       } else {
         repoHelper.markVerifyDone(rmt);
@@ -162,7 +172,10 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       
     } catch(Exception e) {
       log.error(e.getMessage(), e);
-    }    
+      writeLog(sp, e.getMessage());
+    } finally {
+      endLog(sp);
+    }
     
     return ret;
   }
@@ -212,5 +225,26 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     return ret;
   }
 
+  private Span startLog(String spanName) {
+    Span sp = null;
+    if (GlobalTracer.get().activeSpan() != null) {
+      sp = GlobalTracer.get().buildSpan(spanName).asChildOf(GlobalTracer.get().activeSpan()).start();
+    } else {
+      sp = GlobalTracer.get().buildSpan(spanName).start();
+    }
+    
+    return sp;
+  }
+  
+  private void writeLog(Span sp, String msg) {
+    if (sp == null) return;
+    sp.log(msg);
+  }
+  
+  private void endLog(Span sp) {
+    if (sp == null) return;
+    sp.finish();
+  }
 
+  
 }

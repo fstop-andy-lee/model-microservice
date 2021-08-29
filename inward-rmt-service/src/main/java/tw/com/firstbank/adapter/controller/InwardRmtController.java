@@ -10,9 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import io.opentracing.Span;
-import io.opentracing.Tracer;
-import io.opentracing.util.GlobalTracer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.annotation.WebAdapter;
@@ -34,9 +31,6 @@ public class InwardRmtController implements InwardRmtApi {
   @Autowired
   private InwardRmtService inwardRmtService;
   
-  @Autowired
-  private Tracer tracer;
-  
   @Override
   public ResponseEntity<Integer> verified() {
     Integer ret = 0;
@@ -54,16 +48,7 @@ public class InwardRmtController implements InwardRmtApi {
   public ResponseEntity<Integer> verify() {
     Integer ret = 0;
     try {
-      log.error("tesssssss");
-      
-      Span sp = tracer.buildSpan("verifyffff").asChildOf(GlobalTracer.get().activeSpan()).start();
-      
-      sp.log("aaaaaaaaaaaa");
-      
       ret = inwardRmtService.processVerifyPendingInwardRmt();
-      
-      sp.finish();      
-      
     } catch (Exception e) {
       log.error(e.getMessage(), e);
     }

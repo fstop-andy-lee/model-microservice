@@ -4,9 +4,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.stereotype.Component;
+//import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+//import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+//import org.springframework.stereotype.Component;
 import io.jaegertracing.internal.metrics.InMemoryMetricsFactory;
 import io.jaegertracing.internal.samplers.ConstSampler;
 
@@ -19,9 +19,10 @@ import io.opentracing.log.Fields;
 import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
 
-@Component
-@ConditionalOnClass(ch.qos.logback.classic.Logger.class)
-@ConditionalOnProperty(name = "opentracing.jaeger.enabled", havingValue = "true", matchIfMissing = false)
+// DISABLED
+//@Component
+//@ConditionalOnClass(ch.qos.logback.classic.Logger.class)
+//@ConditionalOnProperty(name = "opentracing.jaeger.enabled", havingValue = "true", matchIfMissing = false)
 public class OpenTracingLogAppender extends AppenderBase<Object> {
   
   private Tracer tracer = null; 
@@ -32,6 +33,7 @@ public class OpenTracingLogAppender extends AppenderBase<Object> {
   
   private Integer jaegerPort;
   
+  @SuppressWarnings("unused")
   @Override
   protected void append(Object eventObject) {
     LoggingEvent event = (LoggingEvent) eventObject; 
@@ -44,20 +46,17 @@ public class OpenTracingLogAppender extends AppenderBase<Object> {
       }     
       return;
     }
-    System.out.println("LEVEL=" + event.getLevel());
+
     // ERROR only
     if (Level.ERROR.equals(event.getLevel())) {       
-      System.out.println("LEVEL>>=" + event.getLevel());
-      error(event.getLevel().toString()
-          , loggerName
-          , event.getFormattedMessage()
-          );
-    }
-   
+//      error(event.getLevel().toString()
+//          , loggerName
+//          , event.getFormattedMessage()
+//          );
+    }   
   }
   
   private Span getSpan(String loggerName) {
-    //return tracer.scopeManager().activeSpan();
     Span sp = tracer.scopeManager().activeSpan();
     if (sp == null) {
       sp = startSpan(loggerName);
@@ -65,6 +64,7 @@ public class OpenTracingLogAppender extends AppenderBase<Object> {
     return sp;
   }
   
+  @SuppressWarnings("unused")
   private void error(String level, String loggerName, String message) {
     System.out.println("error");
     Span sp = getSpan(loggerName); 
@@ -79,8 +79,6 @@ public class OpenTracingLogAppender extends AppenderBase<Object> {
     //fields.put(Fields.ERROR_OBJECT, e);
     fields.put(Fields.MESSAGE, message);
     sp.log(fields);
-    sp.log(message);
-    System.out.println("error finish");
     sp.finish();
   }
   
