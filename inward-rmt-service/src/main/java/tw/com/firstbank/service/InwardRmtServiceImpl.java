@@ -8,6 +8,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import io.opentracing.Span;
+import io.opentracing.tag.Tags;
 import io.opentracing.util.GlobalTracer;
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.adapter.channel.InwardRmtChannel;
@@ -117,7 +118,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       
     } catch(Exception e) {
       log.error(e.getMessage(), e);
-      writeLog(sp, e.getMessage());
+      writeError(sp, e.getMessage());
     } finally {
         endLog(sp);
     }
@@ -172,7 +173,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       
     } catch(Exception e) {
       log.error(e.getMessage(), e);
-      writeLog(sp, e.getMessage());
+      writeError(sp, e.getMessage());
     } finally {
       endLog(sp);
     }
@@ -234,6 +235,12 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     }
     
     return sp;
+  }
+
+  private void writeError(Span sp, String msg) {
+    if (sp == null) return;
+    Tags.ERROR.set(sp, true);
+    sp.log(msg);
   }
   
   private void writeLog(Span sp, String msg) {
