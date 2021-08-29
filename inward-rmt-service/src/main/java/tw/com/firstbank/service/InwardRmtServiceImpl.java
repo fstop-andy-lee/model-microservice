@@ -129,7 +129,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
   @SuppressWarnings("unused")
   private Integer processAmlThenInwardRmtThenAdvice(InwardRmt rmt) {
     log.debug("processAmlThenInwardRmtThenAdvice");
-    Span sp = startLog("processInwardRmtThenAmlThenAdvice");
+    Span sp = startLog("processAmlThenInwardRmtThenAdvice");
     Integer ret = 0;
     try {      
       
