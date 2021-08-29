@@ -27,5 +27,5 @@ spring:
       format_sql: true
       ## none, validate, update, create, create-drop  
       ddl-auto: none
-    database-platform: tw.com.firsbank.spring.dialect.PostgreSQL95JsonbDialect
+    database-platform: tw.com.firstbank.spring.dialect.PostgreSQL95JsonbDialect
     show-sql: true

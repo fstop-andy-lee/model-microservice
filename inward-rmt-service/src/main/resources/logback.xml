@@ -38,6 +38,13 @@
           	<MaxFileSize>100MB</MaxFileSize>
         </triggeringPolicy>           
     </appender>
+    
+    <appender name="OTLP" class="tw.com.firstbank.spring.log.appender.OpenTracingLogAppender">
+      <applicationName>aaaaaaa</applicationName>
+      <jaegerHost>10.106.220.158</jaegerHost>
+      <jaegerPort>6831</jaegerPort>
+    </appender>
+    
      	
 	<root level="INFO">
 		<appender-ref ref="CONSOLE" />
@@ -46,6 +53,7 @@
 	<logger name="tw.com.firstbank" level="DEBUG" additivity="false">
 		<appender-ref ref="CONSOLE" />
 		<appender-ref ref="DRF" />  
-	</logger>        
+		<appender-ref ref="OTLP" />
+	</logger> 
 	
 </configuration>

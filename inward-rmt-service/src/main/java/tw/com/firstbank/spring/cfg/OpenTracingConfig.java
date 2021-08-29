@@ -13,6 +13,7 @@ import io.opentracing.Tracer;
 import io.opentracing.util.GlobalTracer;
 
 @Configuration
+@ConditionalOnProperty(name = "opentracing.jaeger.enabled")
 public class OpenTracingConfig {
   
   @Value("${spring.application.name}")

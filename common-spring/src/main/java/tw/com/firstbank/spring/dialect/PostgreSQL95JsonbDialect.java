@@ -1,4 +1,4 @@
-package tw.com.firsbank.spring.dialect;
+package tw.com.firstbank.spring.dialect;
 
 import java.sql.Types;
 

@@ -48,7 +48,7 @@ public class InwardRmtController implements InwardRmtApi {
   public ResponseEntity<Integer> verify() {
     Integer ret = 0;
     try {
-      
+      log.error("tesssssss");
       ret = inwardRmtService.processVerifyPendingInwardRmt();
       
     } catch (Exception e) {
