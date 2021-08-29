@@ -23,5 +23,6 @@ public class OpenTracingLogConfig {
     spanLogsAppender.start();
     Logger rootLogger = (Logger)LoggerFactory.getLogger("tw.com.firstbank");
     rootLogger.addAppender(spanLogsAppender);
-}
+    System.out.println("<< OpenTracingLogConfig >>");
+  }
 }
