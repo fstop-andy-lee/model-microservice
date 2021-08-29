@@ -76,7 +76,7 @@ data:
           show_sql: true
           format_sql: true
           ddl-auto: none
-        database-platform: tw.com.firsbank.spring.dialect.PostgreSQL95JsonbDialect
+        database-platform: tw.com.firstbank.spring.dialect.PostgreSQL95JsonbDialect
         show-sql: true   
     opentracing:
       jaeger:

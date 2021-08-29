@@ -8,12 +8,12 @@ import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
+import io.jaegertracing.internal.metrics.InMemoryMetricsFactory;
+import io.jaegertracing.internal.samplers.ConstSampler;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.spi.LoggingEvent;
 import ch.qos.logback.core.AppenderBase;
-import io.jaegertracing.internal.metrics.InMemoryMetricsFactory;
-import io.jaegertracing.internal.samplers.ConstSampler;
 import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.log.Fields;
@@ -110,7 +110,7 @@ public class OpenTracingLogAppender extends AppenderBase<Object> {
   public Span startSpan(String spanName) {
     Span span = tracer.buildSpan(spanName)
         //.asChildOf("")
-        .withStartTimestamp(Instant.now().getEpochSecond())
+        .withStartTimestamp(Instant.now().toEpochMilli() * 1000)  // microsecond
         .ignoreActiveSpan()
         .start();
     return span;

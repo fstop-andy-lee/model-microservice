@@ -40,7 +40,7 @@
     </appender>
     
     <appender name="OTLP" class="tw.com.firstbank.spring.log.appender.OpenTracingLogAppender">
-      <applicationName>aaaaaaa</applicationName>
+      <applicationName>inward-rmt</applicationName>
       <jaegerHost>10.106.220.158</jaegerHost>
       <jaegerPort>6831</jaegerPort>
     </appender>
