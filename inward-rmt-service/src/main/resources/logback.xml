@@ -50,7 +50,7 @@
 		<appender-ref ref="CONSOLE" />
 	</root>
 	
-	<logger name="tw.com.firstbank" level="DEBUG" additivity="true">
+	<logger name="tw.com.firstbank" level="DEBUG" additivity="false">
 		<appender-ref ref="CONSOLE" />
 		<appender-ref ref="DRF" />  
 		<appender-ref ref="OTLP" />

@@ -1,6 +1,5 @@
 package tw.com.firstbank.spring.log.appender;
 
-import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +17,7 @@ import io.opentracing.Span;
 import io.opentracing.Tracer;
 import io.opentracing.log.Fields;
 import io.opentracing.tag.Tags;
+import io.opentracing.util.GlobalTracer;
 
 @Component
 @ConditionalOnClass(ch.qos.logback.classic.Logger.class)
@@ -41,14 +41,13 @@ public class OpenTracingLogAppender extends AppenderBase<Object> {
       tracer = getTracer();
       if (tracer == null) {
         System.out.println("Null open tracer");                
-      }
-     
+      }     
       return;
     }
-    
+    System.out.println("LEVEL=" + event.getLevel());
     // ERROR only
     if (Level.ERROR.equals(event.getLevel())) {       
-      setErrorTag(loggerName);    
+      System.out.println("LEVEL>>=" + event.getLevel());
       error(event.getLevel().toString()
           , loggerName
           , event.getFormattedMessage()
@@ -65,19 +64,23 @@ public class OpenTracingLogAppender extends AppenderBase<Object> {
     }
     return sp;
   }
-
-  private void setErrorTag(String loggerName) {
-    Span sp = getSpan(loggerName);    
-    Tags.ERROR.set(sp, true);
-  }
   
   private void error(String level, String loggerName, String message) {
-    Span sp = getSpan(loggerName);     
+    System.out.println("error");
+    Span sp = getSpan(loggerName); 
+    
+    // set error tag
+    Tags.ERROR.set(sp, true);
+    sp.setTag("ERROR", true);
+    
+    // output
     Map<String, Object> fields = immutableMap();
     fields.put(Fields.EVENT, level);
     //fields.put(Fields.ERROR_OBJECT, e);
     fields.put(Fields.MESSAGE, message);
     sp.log(fields);
+    sp.log(message);
+    System.out.println("error finish");
     sp.finish();
   }
   
@@ -108,11 +111,15 @@ public class OpenTracingLogAppender extends AppenderBase<Object> {
   }
   
   public Span startSpan(String spanName) {
+    System.out.println("startSpan");
+
     Span span = tracer.buildSpan(spanName)
         //.asChildOf("")
-        .withStartTimestamp(Instant.now().toEpochMilli() * 1000)  // microsecond
-        .ignoreActiveSpan()
-        .start();
+        //.withStartTimestamp(Instant.now().toEpochMilli() * 1000)  // microsecond
+        //.ignoreActiveSpan()
+        .asChildOf(GlobalTracer.get().activeSpan())
+        .start()        
+        ;
     return span;
   }
 
