@@ -61,11 +61,19 @@
       <artifactId>spring-boot-starter-actuator</artifactId>
 	</dependency>
       
+    <!--     
     <dependency>
       <groupId>io.opentracing.contrib</groupId>
       <artifactId>opentracing-spring-jaeger-web-starter</artifactId>
       <version>3.2.0</version>
     </dependency>
+    -->
+    <dependency>
+      <groupId>io.opentracing.contrib</groupId>
+      <artifactId>opentracing-spring-cloud-starter</artifactId>
+      <version>0.5.9</version>
+    </dependency>
+    
       
     <!-- Spring integration -->
 	<dependency>

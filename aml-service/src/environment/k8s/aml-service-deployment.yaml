@@ -79,6 +79,12 @@ data:
         database-platform: tw.com.firstbank.spring.dialect.PostgreSQL95JsonbDialect
         show-sql: true   
     opentracing:
+      spring:
+        cloud:
+          jdbc:
+            enabled: false
+          log:
+            enabled: true
       jaeger:
         enabled: true
         log-spans: true  

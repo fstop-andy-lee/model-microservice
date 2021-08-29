@@ -103,6 +103,12 @@ data:
            # auto, manual
            acknowledge-mode: auto        
     opentracing:
+      spring:
+        cloud:
+          jdbc:
+            enabled: false
+          log:
+            enabled: true
       jaeger:
         enabled: true
         log-spans: true  

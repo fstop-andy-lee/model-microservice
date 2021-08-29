@@ -113,6 +113,12 @@ jasypt:
     password: 123qweAS
 
 opentracing:
+  spring:
+    cloud:
+      jdbc:
+        enabled: false
+      log:
+        enabled: true
   jaeger:
     enabled: true
     log-spans: true  
