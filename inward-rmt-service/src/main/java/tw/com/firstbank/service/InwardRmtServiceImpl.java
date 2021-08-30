@@ -33,6 +33,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
   public InwardRmtDto processInwardRmt(InwardRmtDto dto) {
     Integer ret = 0;
     
+    // 可置換成 orch eng
     ret = processInwardRmtThenAmlThenAdvice(from(dto));
     
     // 現場 live demo 情場一
