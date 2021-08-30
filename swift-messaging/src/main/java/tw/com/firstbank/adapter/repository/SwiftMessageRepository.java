@@ -1,4 +1,4 @@
-package tw.com.firstbank.repository;
+package tw.com.firstbank.adapter.repository;
 
 
 import java.util.List;

@@ -12,16 +12,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import io.opentracing.Span;
+import io.opentracing.tag.Tags;
+import io.opentracing.util.GlobalTracer;
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.adapter.gateway.InwardRmtGateway;
+import tw.com.firstbank.adapter.repository.BankInfoRepository;
 import tw.com.firstbank.entity.BankInfo;
 import tw.com.firstbank.entity.SwiftMessageLog;
 import tw.com.firstbank.model.InwardRmtDto;
 import tw.com.firstbank.model.SwiftMessage;
 import tw.com.firstbank.model.SwiftTask;
 import tw.com.firstbank.model.SwiftTextTag;
-import tw.com.firstbank.repository.BankInfoRepository;
-
 import tw.com.firstbank.util.DateTimeUtil;
 
 @Slf4j
@@ -106,10 +108,6 @@ public class SwiftServiceImpl implements SwiftService {
     for(SwiftMessageLog msg : logs) {
       log.debug(msg.getMsg());
 
-      //TODO: 5 倍量的擴展方式: service? thread?
-      // 共用檔案均是 IO 瓶頸
-      // 但做 event sourcing 會複雜化      
-       
       SwiftTask task = this.parseSwiftMessage(msg.getMsg());
       
       List<InwardRmtDto> rmts = from103(msg.getId(), task);   
@@ -123,9 +121,11 @@ public class SwiftServiceImpl implements SwiftService {
   }
   
   private void processInwardRmt(SwiftMessageLog msg, InwardRmtDto rmt) {
+    Span sp = startTrace("processInwardRmt");
     try {
       // check corr
-      if (isValidReceiverCorr(rmt.getReceiverCorr()) == false) {               
+      if (isValidReceiverCorr(rmt.getReceiverCorr()) == false) {       
+        traceDebug(sp, "Invalid Receiver Corr");
         repoHelper.parsePending(msg);
         return;
       }
@@ -134,9 +134,11 @@ public class SwiftServiceImpl implements SwiftService {
       
       if (processType == 0) {
         // async
+        traceDebug(sp, "processInwardRmtByAsyncEvent");
         inwardRmtGateway.processInwardRmtByAsyncEvent(rmt);        
       } else if (processType == 1) {
         // sync
+        traceDebug(sp, "processInwardRmtByEvent");
         InwardRmtDto ret = inwardRmtGateway.processInwardRmtByEvent(rmt);      
         if (ret.getReplyStatus() > 0) {
           repoHelper.parseComplete(msg);        
@@ -151,7 +153,10 @@ public class SwiftServiceImpl implements SwiftService {
       
     } catch(Exception e) {
       log.error(e.getMessage(), e);
-    }    
+      traceError(sp, e.getMessage());
+    } finally {
+      endTrace(sp);
+    }
   }
     
   private Boolean isValidReceiverCorr(String bic) {
@@ -291,6 +296,35 @@ public class SwiftServiceImpl implements SwiftService {
     
     return task;
   }
+  
+  private Span startTrace(String spanName) {
+    Span sp = null;
+    if (GlobalTracer.get() == null) {
+      return sp;
+    }
+    if (GlobalTracer.get().activeSpan() != null) {
+      sp = GlobalTracer.get().buildSpan(spanName).asChildOf(GlobalTracer.get().activeSpan()).start();
+    } else {
+      sp = GlobalTracer.get().buildSpan(spanName).start();
+    }
     
+    return sp;
+  }
+
+  private void traceError(Span sp, String msg) {
+    if (sp == null) return;
+    Tags.ERROR.set(sp, true);
+    sp.log(msg);
+  }
+  
+  private void traceDebug(Span sp, String msg) {
+    if (sp == null) return;
+    sp.log(msg);
+  }
+  
+  private void endTrace(Span sp) {
+    if (sp == null) return;
+    sp.finish();
+  }
 
 }

@@ -10,6 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import tw.com.firstbank.SwiftMessagingApp;
+import tw.com.firstbank.adapter.repository.SwiftMessageRepository;
 import tw.com.firstbank.domain.type.SwiftMessageStatus;
 
 @RunWith(SpringRunner.class)

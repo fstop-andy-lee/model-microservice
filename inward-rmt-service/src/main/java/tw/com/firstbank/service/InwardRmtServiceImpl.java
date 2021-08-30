@@ -86,7 +86,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
   
   private Integer processInwardRmtThenAmlThenAdvice(InwardRmt rmt) {
     log.debug("processInwardRmtThenAmlThenAdvice");
-    Span sp = startLog("processInwardRmtThenAmlThenAdvice");
+    Span sp = startTrace("processInwardRmtThenAmlThenAdvice");
     
     Integer ret = 0;
     try {
@@ -103,13 +103,13 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       // check aml
       if (amlGateway.screenByApi(rmt.getBenefName()) > 0) {
         log.debug("AML HIT");
-        writeLog(sp, "AML HIT");
+        traceDebug(sp, "AML HIT");
         repoHelper.markVerifyPending(rmt);
         
         return ret;
       } else {
         log.debug("AML OK");          
-        writeLog(sp, "AML OK");
+        traceDebug(sp, "AML OK");
         syncPayment(rmt);
         //asyncPayment(rmt);
         
@@ -118,9 +118,9 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       
     } catch(Exception e) {
       log.error(e.getMessage(), e);
-      writeError(sp, e.getMessage());
+      traceError(sp, e.getMessage());
     } finally {
-        endLog(sp);
+        endTrace(sp);
     }
     
     return ret;
@@ -129,7 +129,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
   @SuppressWarnings("unused")
   private Integer processAmlThenInwardRmtThenAdvice(InwardRmt rmt) {
     log.debug("processAmlThenInwardRmtThenAdvice");
-    Span sp = startLog("processAmlThenInwardRmtThenAdvice");
+    Span sp = startTrace("processAmlThenInwardRmtThenAdvice");
     Integer ret = 0;
     try {      
       
@@ -144,7 +144,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       Integer amlStatus = amlGateway.screenByApi(rmt.getBenefName());
       if (amlStatus > 0) {
         log.debug("AML HIT");
-        writeLog(sp, "AML HIT");
+        traceDebug(sp, "AML HIT");
         repoHelper.markVerifyPending(rmt);
       } else {
         repoHelper.markVerifyDone(rmt);
@@ -160,7 +160,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       if (rmt.isVerifyDone()) {
         // print rmt advice & notice
         printRmtAdvice(rmt);
-        // wating for payment
+        // waiting for payment
         repoHelper.markPayment(rmt);
          
         repoHelper.payment(rmt);
@@ -173,9 +173,9 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
       
     } catch(Exception e) {
       log.error(e.getMessage(), e);
-      writeError(sp, e.getMessage());
+      traceError(sp, e.getMessage());
     } finally {
-      endLog(sp);
+      endTrace(sp);
     }
     
     return ret;
@@ -186,7 +186,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     repoHelper.markVerifyDone(rmt);
     // print rmt advice & notice
     printRmtAdvice(rmt);
-    // wating for payment
+    // waiting for payment
     repoHelper.markPayment(rmt);
     
     repoHelper.payment(rmt);
@@ -226,8 +226,11 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     return ret;
   }
 
-  private Span startLog(String spanName) {
+  private Span startTrace(String spanName) {
     Span sp = null;
+    if (GlobalTracer.get() == null) {
+      return sp;
+    }
     if (GlobalTracer.get().activeSpan() != null) {
       sp = GlobalTracer.get().buildSpan(spanName).asChildOf(GlobalTracer.get().activeSpan()).start();
     } else {
@@ -237,18 +240,18 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     return sp;
   }
 
-  private void writeError(Span sp, String msg) {
+  private void traceError(Span sp, String msg) {
     if (sp == null) return;
     Tags.ERROR.set(sp, true);
     sp.log(msg);
   }
   
-  private void writeLog(Span sp, String msg) {
+  private void traceDebug(Span sp, String msg) {
     if (sp == null) return;
     sp.log(msg);
   }
   
-  private void endLog(Span sp) {
+  private void endTrace(Span sp) {
     if (sp == null) return;
     sp.finish();
   }

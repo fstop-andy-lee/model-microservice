@@ -1,11 +1,11 @@
-package tw.com.firstbank.repository;
+package tw.com.firstbank.adapter.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import tw.com.firstbank.entity.Position;
+import tw.com.firstbank.entity.RmtAdvice;
 
 @RepositoryRestResource
-public interface PositionRepository extends JpaRepository<Position, String> {
+public interface RmtAdviceRepository extends JpaRepository<RmtAdvice, String> {
 
 }

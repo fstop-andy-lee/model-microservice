@@ -9,6 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
+import tw.com.firstbank.adapter.repository.AcMrRepository;
+import tw.com.firstbank.adapter.repository.BafotrRepository;
+import tw.com.firstbank.adapter.repository.BillRptRepository;
+import tw.com.firstbank.adapter.repository.InwardRmtRepository;
+import tw.com.firstbank.adapter.repository.MasterRepository;
+import tw.com.firstbank.adapter.repository.PositionRepository;
+import tw.com.firstbank.adapter.repository.RmtAdviceRepository;
+import tw.com.firstbank.adapter.repository.RmtCbQtaRepository;
+import tw.com.firstbank.adapter.repository.RmtCbRpt3Repository;
 import tw.com.firstbank.domain.type.InwardRmtStatus;
 import tw.com.firstbank.domain.type.VerifyStatus;
 import tw.com.firstbank.entity.AcMr;
@@ -20,15 +29,6 @@ import tw.com.firstbank.entity.Position;
 import tw.com.firstbank.entity.RmtAdvice;
 import tw.com.firstbank.entity.RmtCbQta;
 import tw.com.firstbank.entity.RmtCbRpt3;
-import tw.com.firstbank.repository.AcMrRepository;
-import tw.com.firstbank.repository.BafotrRepository;
-import tw.com.firstbank.repository.BillRptRepository;
-import tw.com.firstbank.repository.InwardRmtRepository;
-import tw.com.firstbank.repository.MasterRepository;
-import tw.com.firstbank.repository.PositionRepository;
-import tw.com.firstbank.repository.RmtAdviceRepository;
-import tw.com.firstbank.repository.RmtCbQtaRepository;
-import tw.com.firstbank.repository.RmtCbRpt3Repository;
 
 /**
  * Any self-invocation calls will not start any transaction

@@ -1,4 +1,4 @@
-package tw.com.firstbank.repository;
+package tw.com.firstbank.adapter.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;

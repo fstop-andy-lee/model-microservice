@@ -9,9 +9,9 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import tw.com.firstbank.adapter.repository.SwiftMessageRepository;
 import tw.com.firstbank.domain.type.SwiftMessageStatus;
 import tw.com.firstbank.entity.SwiftMessageLog;
-import tw.com.firstbank.repository.SwiftMessageRepository;
 
 /**
  * Any self-invocation calls will not start any transaction

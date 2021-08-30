@@ -1,10 +1,11 @@
-package tw.com.firstbank.repository;
+package tw.com.firstbank.adapter.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import tw.com.firstbank.entity.Bafotr;
+
+import tw.com.firstbank.entity.RmtCbQta;
 
 @RepositoryRestResource
-public interface BafotrRepository extends JpaRepository<Bafotr, String> {
+public interface RmtCbQtaRepository extends JpaRepository<RmtCbQta, String> {
 
 }
