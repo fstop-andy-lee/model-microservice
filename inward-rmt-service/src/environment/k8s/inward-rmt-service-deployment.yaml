@@ -169,7 +169,7 @@ spec:
       matchLabels:
         app: inward-rmt-service
   replicas: 1
-  revisionHistoryLimit: 3
+  revisionHistoryLimit: 10
   progressDeadlineSeconds: 600
   strategy:
     type: RollingUpdate
@@ -191,6 +191,11 @@ spec:
           ports:
             - name: http
               containerPort: 8070
+          resources:
+            limits:
+              cpu: 20m
+            requests:
+              cpu: 10m
           env:         
             - name: SPRING_PROFILES_ACTIVE
               valueFrom:
