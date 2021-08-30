@@ -193,9 +193,9 @@ spec:
               containerPort: 8070
           resources:
             limits:
-              cpu: 20m
+              cpu: 1100m
             requests:
-              cpu: 10m
+              cpu: 1050m
           env:         
             - name: SPRING_PROFILES_ACTIVE
               valueFrom:
