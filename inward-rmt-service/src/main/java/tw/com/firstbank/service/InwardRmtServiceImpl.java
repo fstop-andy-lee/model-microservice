@@ -51,7 +51,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     for(InwardRmt rmt : rmts) {
       // print rmt advice & notice
       printRmtAdvice(rmt);
-      // wating for payment
+      // waiting for payment
       repoHelper.markPayment(rmt);
       
       repoHelper.payment(rmt);
