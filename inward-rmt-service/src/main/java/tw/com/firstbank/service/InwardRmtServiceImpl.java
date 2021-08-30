@@ -33,10 +33,10 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
   public InwardRmtDto processInwardRmt(InwardRmtDto dto) {
     Integer ret = 0;
     
-    ret = processInwardRmtThenAmlThenAdvice(from(dto));
+    //ret = processInwardRmtThenAmlThenAdvice(from(dto));
     
     // 現場 live demo 情場一，配合案例三  
-    //ret = processAmlThenInwardRmtThenAdvice(from(dto));
+    ret = processAmlThenInwardRmtThenAdvice(from(dto));
     
     dto.setReplyStatus(ret);
     
