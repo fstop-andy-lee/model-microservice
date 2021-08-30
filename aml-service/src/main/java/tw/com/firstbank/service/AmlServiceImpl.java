@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.adapter.channel.AmlChannel;
-import tw.com.firstbank.repository.BlackListRepository;
+import tw.com.firstbank.adapter.repository.BlackListRepository;
 
 @Slf4j
 @Service
