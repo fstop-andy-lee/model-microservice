@@ -86,8 +86,8 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
   }
   
   private Integer processInwardRmtThenAmlThenAdvice(InwardRmt rmt) {
-    log.debug("processInwardRmtThenAmlThenAdvice");
-    Span sp = startTrace("processInwardRmtThenAmlThenAdvice");
+    log.debug("processInwardRmtThenAmlThenAdvice {}", rmt.getId());
+    Span sp = startTrace("processInwardRmtThenAmlThenAdvice " + rmt.getId());
     
     Integer ret = 0;
     try {
@@ -129,8 +129,8 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
   
   @SuppressWarnings("unused")
   private Integer processAmlThenInwardRmtThenAdvice(InwardRmt rmt) {
-    log.debug("processAmlThenInwardRmtThenAdvice");
-    Span sp = startTrace("processAmlThenInwardRmtThenAdvice");
+    log.debug("processAmlThenInwardRmtThenAdvice {}", rmt.getId());
+    Span sp = startTrace("processAmlThenInwardRmtThenAdvice " + rmt.getId() );
     Integer ret = 0;
     try {      
       
