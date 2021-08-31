@@ -121,7 +121,7 @@ public class SwiftServiceImpl implements SwiftService {
   }
   
   private void processInwardRmt(SwiftMessageLog msg, InwardRmtDto rmt) {
-    Span sp = startTrace("processInwardRmt");
+    Span sp = startTrace("processInwardRmt {}" + rmt.getId());
     try {
       // check corr
       if (isValidReceiverCorr(rmt.getReceiverCorr()) == false) {       
