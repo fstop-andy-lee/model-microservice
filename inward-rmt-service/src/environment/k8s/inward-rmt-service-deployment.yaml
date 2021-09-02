@@ -168,7 +168,7 @@ spec:
   selector:
       matchLabels:
         app: inward-rmt-service
-  replicas: 1
+  replicas: 2
   revisionHistoryLimit: 10
   progressDeadlineSeconds: 600
   strategy:
@@ -187,7 +187,13 @@ spec:
         - name: inward-rmt-service
           image: andylee1973/inward-rmt-service:latest
           imagePullPolicy: Always #IfNotPresent
-          livenessProbe:
+          startupProbe:
+            httpGet:
+              path: /
+              port: 8070
+            failureThreshold: 30
+            periodSeconds: 10            
+          readinessProbe:
             httpGet:
               path: /
               port: 8070
@@ -195,7 +201,18 @@ spec:
                 - name: X-Custom-Header
                   value: test
             initialDelaySeconds: 30
-            timeoutSeconds: 1            
+            failureThreshold: 3
+            periodSeconds: 60                  
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8070
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: test
+            initialDelaySeconds: 60
+            failureThreshold: 3
+            periodSeconds: 3600            
           args: ["--spring.config.location=/home/spring/app/conf/"]
           ports:
             - name: http
