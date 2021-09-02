@@ -93,6 +93,15 @@ spec:
         - name: inward-rmt-service
           image: andylee/inward-rmt-service:latest
           imagePullPolicy: Always #IfNotPresent
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8070
+              httpHeaders:
+                - name: X-Custom-Header
+                  value: test
+            initialDelaySeconds: 30
+            timeoutSeconds: 1            
           args: ["--spring.config.location=/home/spring/app/conf/"]
           ports:
             - name: http
