@@ -86,7 +86,10 @@ spring:
      trustStorePassphrase:
    channelCacheSize: 100
    listener:
+     direct:
+       prefetch: 1
      simple:
+       prefetch: 1
        default-requeue-rejected: false
        retry:
          enabled: false
