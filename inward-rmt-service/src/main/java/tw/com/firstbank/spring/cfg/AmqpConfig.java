@@ -1,7 +1,6 @@
 package tw.com.firstbank.spring.cfg;
 
 import org.springframework.amqp.core.Queue;
-
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -31,7 +30,7 @@ public class AmqpConfig {
       rabbitTemplate.setMessageConverter(producerJackson2MessageConverter());
       return rabbitTemplate;
   }
-
+  
   @Bean
   public Jackson2JsonMessageConverter producerJackson2MessageConverter() {
       return new Jackson2JsonMessageConverter();
