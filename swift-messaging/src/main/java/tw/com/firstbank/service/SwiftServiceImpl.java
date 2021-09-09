@@ -128,6 +128,8 @@ public class SwiftServiceImpl implements SwiftService {
         return;
       }
       
+      repoHelper.markHold(msg);
+      
       // check corr
       if (isValidReceiverCorr(rmt.getReceiverCorr()) == false) {       
         traceDebug(sp, "Invalid Receiver Corr");

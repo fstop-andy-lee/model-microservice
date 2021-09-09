@@ -53,6 +53,11 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     swiftMsgRepo.save(msgLog);
   }
   
+  public void markHold(SwiftMessageLog msgLog) {
+    msgLog.setStatus(SwiftMessageStatus.HOLD);
+    swiftMsgRepo.save(msgLog);
+  }
+  
   public void markDone(SwiftMessageLog msgLog) {
     msgLog.setStatus(SwiftMessageStatus.DONE);
     swiftMsgRepo.save(msgLog);

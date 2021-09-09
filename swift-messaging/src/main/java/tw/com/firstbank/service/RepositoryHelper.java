@@ -10,6 +10,7 @@ public interface RepositoryHelper {
   public void markPending(SwiftMessageLog msgLog);
   public void markDone(SwiftMessageLog msgLog);  
   public void markDone(String msgKey);
+  public void markHold(SwiftMessageLog msgLog);
   
   public void parseComplete(SwiftMessageLog msg);
   public void parsePending(SwiftMessageLog msg);

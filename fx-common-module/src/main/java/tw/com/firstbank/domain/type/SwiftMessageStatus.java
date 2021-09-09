@@ -8,6 +8,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
    1 = 待人工處理
    2 = 電文錯誤
    3 = 註銷
+   8 = HOLD
    9 = 已處理  
  */
 public enum SwiftMessageStatus {
@@ -27,6 +28,10 @@ public enum SwiftMessageStatus {
    * 3 = 註銷
    */
   DELETED(3),
+  /**
+   * 8 = HOLD
+   */
+  HOLD(8),
   /**
    * 9 = 已處理
    */
@@ -53,6 +58,7 @@ public enum SwiftMessageStatus {
         case 1 : return PENDING;
         case 2 : return ERROR;
         case 3 : return DELETED;
+        case 8 : return HOLD;
         case 9 : return DONE;
         default: return INACTIVE;
      }
