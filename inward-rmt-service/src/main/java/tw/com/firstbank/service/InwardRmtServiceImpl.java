@@ -2,9 +2,6 @@ package tw.com.firstbank.service;
 
 import java.util.List;
 
-import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
-
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -136,11 +133,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     Span sp = startTrace("processAmlThenInwardRmtThenAdvice " + rmt.getId() );
     Integer ret = 0;
     try {      
-      
-      if (repoHelper.isExistInwardRmt(rmt.getId())) {
-        return 1;
-      }
-      
+            
       // 取姓名
       Master master = repoHelper.findMasterByAcct(rmt.getBenefAcct());
       if (master != null) {

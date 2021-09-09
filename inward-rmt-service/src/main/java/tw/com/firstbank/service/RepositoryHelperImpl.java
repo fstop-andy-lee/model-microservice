@@ -123,6 +123,10 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   @Transactional
   public void parseComplete(InwardRmt rmt, Bafotr otr) {
     
+    if (isExistInwardRmt(rmt.getId())) {
+      return;
+    }
+    
     // 1 匯入資料檔
     saveInwardRmt(rmt);
     
@@ -132,6 +136,9 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   
   @Transactional
   public void payment(InwardRmt rmt) {
+    if (isExistInwardRmt(rmt.getId())) {
+      return;
+    }
     
     // 1 入扣帳 I/O
     creditAccount(rmt);
