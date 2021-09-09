@@ -131,13 +131,15 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
   }
   
   @SuppressWarnings("unused")
-  @Transactional
   private Integer processAmlThenInwardRmtThenAdvice(InwardRmt rmt) {
     log.debug("processAmlThenInwardRmtThenAdvice {}", rmt.getId());
     Span sp = startTrace("processAmlThenInwardRmtThenAdvice " + rmt.getId() );
     Integer ret = 0;
     try {      
       
+      if (repoHelper.isExistInwardRmt(rmt.getId())) {
+        return 1;
+      }
       
       // 取姓名
       Master master = repoHelper.findMasterByAcct(rmt.getBenefAcct());

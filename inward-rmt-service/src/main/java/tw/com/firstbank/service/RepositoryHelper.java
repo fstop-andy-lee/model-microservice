@@ -22,4 +22,5 @@ public interface RepositoryHelper {
   public void parseComplete(InwardRmt rmt, Bafotr otr);
   public void payment(InwardRmt rmt);
   public void billRpt(InwardRmt rmt);
+  public Boolean isExistInwardRmt(String key);
 }

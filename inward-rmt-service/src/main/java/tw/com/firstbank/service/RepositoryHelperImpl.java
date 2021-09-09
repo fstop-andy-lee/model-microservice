@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.List;
 
 import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,12 +66,10 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   @Autowired
   private BillRptRepository billRptRepo;  
   
-  @Transactional(value = TxType.SUPPORTS)  
   public void saveBafotr(Bafotr otr) {
     bafotrRepo.save(otr);
   }
   
-  @Transactional(value = TxType.SUPPORTS)
   public void addBafotr(Bafotr otr) {
     Bafotr baf = null;
     
@@ -94,37 +91,31 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     return masterRepo.findById(acct).orElse(null);
   }
   
-  @Transactional(value = TxType.SUPPORTS)
   public void markVerifyPending(InwardRmt rmt) {
     rmt.setVerifyStatus(VerifyStatus.PENDING);
     saveInwardRmt(rmt);
   }
 
-  @Transactional(value = TxType.SUPPORTS)
   public void markVerifyDone(InwardRmt rmt) {
     rmt.setVerifyStatus(VerifyStatus.DONE);
     rmt.setStatus(InwardRmtStatus.PAY);
     saveInwardRmt(rmt);
   }
   
-  @Transactional(value = TxType.SUPPORTS)
   public void markPayment(InwardRmt rmt) {
     rmt.setStatus(InwardRmtStatus.PAY);
     saveInwardRmt(rmt);
   }
   
-  @Transactional(value = TxType.SUPPORTS)
   public void markDone(InwardRmt rmt) {
     rmt.setStatus(InwardRmtStatus.DONE);
     saveInwardRmt(rmt);
   }
   
-  @Transactional(value = TxType.SUPPORTS)
   public void saveRmtAdvice(RmtAdvice advice) {
     rmtAdviceRepo.save(advice);
   }
   
-  @Transactional(value = TxType.SUPPORTS)
   public void saveInwardRmt(InwardRmt rmt) {
     inwardRmtRepo.save(rmt);
   }
@@ -200,7 +191,6 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     
   }
   
-  @Transactional(value = TxType.SUPPORTS)
   public void creditAccount(InwardRmt rmt) {
     Master master = findMasterByAcct(rmt.getBenefAcct());
     if (master == null) {
@@ -212,7 +202,6 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     masterRepo.save(master);
   }
   
-  @Transactional(value = TxType.SUPPORTS)
   public void creditAcMr(InwardRmt rmt) {
     String acno = null;
     AcMr acmr = null;
@@ -245,7 +234,6 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     
   }
   
-  @Transactional(value = TxType.SUPPORTS)
   public void createRmtCbRpt3(InwardRmt rmt) {
     RmtCbRpt3 rpt = new RmtCbRpt3();
     
@@ -264,7 +252,6 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     rmtCbRpt3Repo.save(rpt);
   }
   
-  @Transactional(value = TxType.SUPPORTS)
   public void createRmtCbQta(InwardRmt rmt) {
     RmtCbQta qta = new RmtCbQta();
     
@@ -279,7 +266,6 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     rmtCbQtaRepo.save(qta);
   }
   
-  @Transactional(value = TxType.SUPPORTS)
   public void creditPosition(InwardRmt rmt) {
     Position pos = positionRepo.findById(rmt.getCcy()).orElse(null);
     
@@ -312,6 +298,8 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     return ret;
   }
   
-  
+  public Boolean isExistInwardRmt(String key) {
+    return inwardRmtRepo.existsById(key);
+  }
   
 }
