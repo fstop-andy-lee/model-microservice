@@ -238,6 +238,7 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     
   }
   
+  @Transactional(value = TxType.SUPPORTS)
   public void createRmtCbRpt3(InwardRmt rmt) {
     RmtCbRpt3 rpt = new RmtCbRpt3();
     
@@ -256,6 +257,7 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     rmtCbRpt3Repo.save(rpt);
   }
   
+  @Transactional(value = TxType.SUPPORTS)
   public void createRmtCbQta(InwardRmt rmt) {
     RmtCbQta qta = new RmtCbQta();
     
@@ -270,6 +272,7 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     rmtCbQtaRepo.save(qta);
   }
   
+  @Transactional(value = TxType.SUPPORTS)
   public void creditPosition(InwardRmt rmt) {
     Position pos = positionRepo.findById(rmt.getCcy()).orElse(null);
     
