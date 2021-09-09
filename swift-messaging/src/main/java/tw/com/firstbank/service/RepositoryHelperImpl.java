@@ -57,6 +57,14 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     msgLog.setStatus(SwiftMessageStatus.DONE);
     swiftMsgRepo.save(msgLog);
   }
+  
+  public Boolean isInactive(String msgKey) {
+    Optional<SwiftMessageLog> opt = swiftMsgRepo.findById(msgKey);
+    if (opt.isPresent() && opt.get().getStatus() == SwiftMessageStatus.INACTIVE) {
+      return true;
+    }
+    return false;
+  }
     
   @Transactional
   public void parseComplete(SwiftMessageLog msg) {

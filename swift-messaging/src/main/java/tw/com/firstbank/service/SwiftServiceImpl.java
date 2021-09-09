@@ -123,6 +123,11 @@ public class SwiftServiceImpl implements SwiftService {
   private void processInwardRmt(SwiftMessageLog msg, InwardRmtDto rmt) {
     Span sp = startTrace("processInwardRmt " + rmt.getId());
     try {
+      
+      if (repoHelper.isInactive(msg.getId()) == false) {
+        return;
+      }
+      
       // check corr
       if (isValidReceiverCorr(rmt.getReceiverCorr()) == false) {       
         traceDebug(sp, "Invalid Receiver Corr");

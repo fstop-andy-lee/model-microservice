@@ -13,4 +13,5 @@ public interface RepositoryHelper {
   
   public void parseComplete(SwiftMessageLog msg);
   public void parsePending(SwiftMessageLog msg);
+  public Boolean isInactive(String msgKey);
 }
