@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.List;
 
 import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -192,6 +193,7 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     
   }
   
+  @Transactional(value = TxType.SUPPORTS)
   public void creditAccount(InwardRmt rmt) {
     Master master = findMasterByAcct(rmt.getBenefAcct());
     if (master == null) {
@@ -203,6 +205,7 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     masterRepo.save(master);
   }
   
+  @Transactional(value = TxType.SUPPORTS)
   public void creditAcMr(InwardRmt rmt) {
     String acno = null;
     AcMr acmr = null;
