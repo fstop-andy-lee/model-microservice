@@ -67,11 +67,12 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   @Autowired
   private BillRptRepository billRptRepo;  
   
-    
+  @Transactional(value = TxType.SUPPORTS)  
   public void saveBafotr(Bafotr otr) {
     bafotrRepo.save(otr);
   }
   
+  @Transactional(value = TxType.SUPPORTS)
   public void addBafotr(Bafotr otr) {
     Bafotr baf = null;
     
@@ -93,31 +94,37 @@ public class RepositoryHelperImpl implements RepositoryHelper {
     return masterRepo.findById(acct).orElse(null);
   }
   
+  @Transactional(value = TxType.SUPPORTS)
   public void markVerifyPending(InwardRmt rmt) {
     rmt.setVerifyStatus(VerifyStatus.PENDING);
     saveInwardRmt(rmt);
   }
 
+  @Transactional(value = TxType.SUPPORTS)
   public void markVerifyDone(InwardRmt rmt) {
     rmt.setVerifyStatus(VerifyStatus.DONE);
     rmt.setStatus(InwardRmtStatus.PAY);
     saveInwardRmt(rmt);
   }
   
+  @Transactional(value = TxType.SUPPORTS)
   public void markPayment(InwardRmt rmt) {
     rmt.setStatus(InwardRmtStatus.PAY);
     saveInwardRmt(rmt);
   }
   
+  @Transactional(value = TxType.SUPPORTS)
   public void markDone(InwardRmt rmt) {
     rmt.setStatus(InwardRmtStatus.DONE);
     saveInwardRmt(rmt);
   }
   
+  @Transactional(value = TxType.SUPPORTS)
   public void saveRmtAdvice(RmtAdvice advice) {
     rmtAdviceRepo.save(advice);
   }
   
+  @Transactional(value = TxType.SUPPORTS)
   public void saveInwardRmt(InwardRmt rmt) {
     inwardRmtRepo.save(rmt);
   }

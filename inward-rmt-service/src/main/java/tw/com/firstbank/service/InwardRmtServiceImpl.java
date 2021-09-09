@@ -2,6 +2,9 @@ package tw.com.firstbank.service;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -128,6 +131,7 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
   }
   
   @SuppressWarnings("unused")
+  @Transactional
   private Integer processAmlThenInwardRmtThenAdvice(InwardRmt rmt) {
     log.debug("processAmlThenInwardRmtThenAdvice {}", rmt.getId());
     Span sp = startTrace("processAmlThenInwardRmtThenAdvice " + rmt.getId() );
