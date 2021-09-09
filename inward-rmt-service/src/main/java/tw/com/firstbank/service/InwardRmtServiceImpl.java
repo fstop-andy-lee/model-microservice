@@ -34,10 +34,10 @@ public class InwardRmtServiceImpl implements InwardRmtService, InwardRmtChannel 
     Integer ret = 0;
     
     // 可置換成 orchestrator engine
-    ret = processInwardRmtThenAmlThenAdvice(from(dto));
+    //ret = processInwardRmtThenAmlThenAdvice(from(dto));
     
     // 現場 live demo 場景一
-    //ret = processAmlThenInwardRmtThenAdvice(from(dto));
+    ret = processAmlThenInwardRmtThenAdvice(from(dto));
     
     dto.setReplyStatus(ret);
     
