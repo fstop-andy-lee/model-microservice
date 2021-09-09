@@ -2,6 +2,7 @@ package tw.com.firstbank.service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 
 import javax.transaction.Transactional;
 
@@ -136,9 +137,12 @@ public class RepositoryHelperImpl implements RepositoryHelper {
   
   @Transactional
   public void payment(InwardRmt rmt) {
-    if (isExistInwardRmt(rmt.getId())) {
+    
+    Optional<InwardRmt> opt = inwardRmtRepo.findById(rmt.getId());
+    if (opt.isPresent() && opt.get().getStatus() == InwardRmtStatus.DONE) {
       return;
     }
+    
     
     // 1 入扣帳 I/O
     creditAccount(rmt);
