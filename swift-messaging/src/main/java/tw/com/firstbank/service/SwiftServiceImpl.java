@@ -108,6 +108,12 @@ public class SwiftServiceImpl implements SwiftService {
     for(SwiftMessageLog msg : logs) {
       log.debug(msg.getMsg());
 
+      if (repoHelper.isInactive(msg.getId()) == false) {
+        continue;
+      }
+      
+      repoHelper.markHold(msg);
+      
       SwiftTask task = this.parseSwiftMessage(msg.getMsg());
       
       List<InwardRmtDto> rmts = from103(msg.getId(), task);   
@@ -123,12 +129,6 @@ public class SwiftServiceImpl implements SwiftService {
   private void processInwardRmt(SwiftMessageLog msg, InwardRmtDto rmt) {
     Span sp = startTrace("processInwardRmt " + rmt.getId());
     try {
-      
-      if (repoHelper.isInactive(msg.getId()) == false) {
-        return;
-      }
-      
-      repoHelper.markHold(msg);
       
       // check corr
       if (isValidReceiverCorr(rmt.getReceiverCorr()) == false) {       
