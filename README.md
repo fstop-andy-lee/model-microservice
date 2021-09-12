@@ -25,3 +25,4 @@ sudo apt install maven
 ## Unit Test
 
 mvn -Dtest=InwardRmtApp -DfailIfNoTests=false test
+ 
