@@ -8,11 +8,6 @@ node {
     def  PROJECT_NAME = 'swift-messaging'
     def  IMAGE_NAME = 'andylee1973/swift-messaging'    
     def  BUILD_NUMBER = sh(script:'date +%Y-%m-%d', returnStdout: true).trim()  
-	
-    tools
-    {
-       maven "Maven3"
-    }
     
     environment {
       DOCKERHUB_TOKEN = credentials(DOCKERHUB_TOKEN_ID)
