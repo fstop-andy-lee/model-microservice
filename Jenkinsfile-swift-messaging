@@ -15,37 +15,33 @@ node {
 	  }
     
   
-    stage('Checkout Source') {
-          //steps {             
-          //      git branch: 'develop', url: 'https://github.com/fstop-andy-lee/model-microservice.git'        
-          //}
+    stage('Checkout Source') {         
           checkout scm
         }
     stage('Execute Maven') {
 	       environment {
                 VERSION = sh(script:'cd ./${PROJECT_NAME} && mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
            }
-           steps {  
                 sh 'mvn clean package -DskipTests'             
                 sh 'rm ./${PROJECT_NAME}/src/environment/docker/lib/dummy'
                 sh 'cp ./${PROJECT_NAME}/target/${PROJECT_NAME}-${VERSION}.jar ./${PROJECT_NAME}/src/environment/docker/lib/.'
                 sh 'cp ./${PROJECT_NAME}/src/main/resources/*.yml ./${PROJECT_NAME}/src/environment/docker/conf/.'
                 sh 'whoami'
                 sh 'env'
-          }
+          
         }
     stage('Docker Build and Tag') {
            environment {
                 VERSION = sh(script:'cd ./${PROJECT_NAME} && mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
            }
-           steps {  
+             
                 sh 'sudo podman build --build-arg JAR_NAME=${PROJECT_NAME}-${VERSION}.jar -t ${IMAGE_NAME} ${PROJECT_NAME}/src/environment/docker'   
                 sh 'sudo podman tag ${IMAGE_NAME} ${IMAGE_NAME}:${BUILD_NUMBER}'
-          }
+          
         }
      
     stage('Publish image to Docker Hub') {
-           steps {
+           
               withCredentials([usernamePassword(credentialsId: DOCKERHUB_TOKEN_ID, passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                 sh """
                     #!/bin/bash
@@ -57,7 +53,7 @@ node {
                     sudo podman logout ${DOCKER_REGISTRY_URL}
                    """
               }  
-          }
+          
         }     
     /*
     stage('Deploy to k8s') {
