@@ -21,13 +21,23 @@ node {
 	       environment {
                 VERSION = sh(script:'cd ./${PROJECT_NAME} && mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
            }
+         
+         sh """
+             whoami
+             env
+             mvn clean package -DskipTests
+             rm ./${PROJECT_NAME}/src/environment/docker/lib/dummy
+             cp ./${PROJECT_NAME}/target/${PROJECT_NAME}-${VERSION}.jar ./${PROJECT_NAME}/src/environment/docker/lib/.
+             cp ./${PROJECT_NAME}/src/main/resources/*.yml ./${PROJECT_NAME}/src/environment/docker/conf/.
+            """     
+            /*            
                 sh 'whoami'
                 sh 'env'
                 sh 'mvn clean package -DskipTests'             
                 sh 'rm ./${PROJECT_NAME}/src/environment/docker/lib/dummy'
                 sh 'cp ./${PROJECT_NAME}/target/${PROJECT_NAME}-${VERSION}.jar ./${PROJECT_NAME}/src/environment/docker/lib/.'
                 sh 'cp ./${PROJECT_NAME}/src/main/resources/*.yml ./${PROJECT_NAME}/src/environment/docker/conf/.'
-          
+            */
         }
     stage('Docker Build and Tag') {
            environment {
