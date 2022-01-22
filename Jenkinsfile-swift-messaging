@@ -8,10 +8,6 @@ node {
     def  PROJECT_NAME = 'swift-messaging'
     def  IMAGE_NAME = 'andylee1973/swift-messaging'    
     def  BUILD_NUMBER = sh(script:'date +%Y-%m-%d', returnStdout: true).trim()  
-
-    agent {
-     label "Nodes=JavaSlaveNode1"
-    }
 	
     tools
     {
