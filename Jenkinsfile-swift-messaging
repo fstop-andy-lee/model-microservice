@@ -18,11 +18,11 @@ node {
           checkout scm
         }
     stage('Execute Maven') {
-	       environment {
-                VERSION = sh(script:'cd ./${PROJECT_NAME} && mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
-           }
-         
+	       
+         VERSION = sh(script:'cd ./${PROJECT_NAME} && mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
+         echo "${VERSION}"        
          sh """
+             #!/bin/bash
              whoami
              env
              mvn clean package -DskipTests
