@@ -36,8 +36,9 @@ node {
           echo "${VERSION}" 
           sh """
               #!/bin/bash
-              sudo podman build --build-arg JAR_NAME=${PROJECT_NAME}-${VERSION}.jar -t ${IMAGE_NAME} ${PROJECT_NAME}/src/environment/docker
-              sudo podman tag ${IMAGE_NAME} ${IMAGE_NAME}:${VERSION}
+              IMAGE=${DOCKER_REGISTRY}/${IMAGE_NAME}
+              sudo podman build --build-arg JAR_NAME=${PROJECT_NAME}-${VERSION}.jar -t \${IMAGE} ${PROJECT_NAME}/src/environment/docker
+              sudo podman tag \${IMAGE} \${IMAGE}:${VERSION}
              """          
         }
      
