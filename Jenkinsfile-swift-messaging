@@ -6,9 +6,8 @@ node {
     def  DOCKER_NAMESPACE = 'default'
     def  DOCKER_USER = 'andylee1973'
     def  PROJECT_NAME = 'swift-messaging'
-    def  IMAGE_NAME = 'andylee1973/swift-messaging'    
-    def  BUILD_NUMBER = sh(script:'date +%Y-%m-%d', returnStdout: true).trim()  
-    
+    def  IMAGE_NAME = 'andylee1973/swift-messaging'      
+        
     environment {
       DOCKERHUB_TOKEN = credentials(DOCKERHUB_TOKEN_ID)
       CTS = sh(script:'date +%Y-%m-%dT%H:%M:00Z', returnStdout: true).trim()	  
@@ -30,23 +29,16 @@ node {
              cp ./${PROJECT_NAME}/target/${PROJECT_NAME}-${VERSION}.jar ./${PROJECT_NAME}/src/environment/docker/lib/.
              cp ./${PROJECT_NAME}/src/main/resources/*.yml ./${PROJECT_NAME}/src/environment/docker/conf/.
             """     
-            /*            
-                sh 'whoami'
-                sh 'env'
-                sh 'mvn clean package -DskipTests'             
-                sh 'rm ./${PROJECT_NAME}/src/environment/docker/lib/dummy'
-                sh 'cp ./${PROJECT_NAME}/target/${PROJECT_NAME}-${VERSION}.jar ./${PROJECT_NAME}/src/environment/docker/lib/.'
-                sh 'cp ./${PROJECT_NAME}/src/main/resources/*.yml ./${PROJECT_NAME}/src/environment/docker/conf/.'
-            */
+            
         }
     stage('Docker Build and Tag') {
-           environment {
-                VERSION = sh(script:'cd ./${PROJECT_NAME} && mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
-           }
-             
-                sh 'sudo podman build --build-arg JAR_NAME=${PROJECT_NAME}-${VERSION}.jar -t ${IMAGE_NAME} ${PROJECT_NAME}/src/environment/docker'   
-                sh 'sudo podman tag ${IMAGE_NAME} ${IMAGE_NAME}:${BUILD_NUMBER}'
-          
+          VERSION = sh(script:'cd ./${PROJECT_NAME} && mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
+          echo "${VERSION}" 
+          sh """
+              #!/bin/bash
+              sudo podman build --build-arg JAR_NAME=${PROJECT_NAME}-${VERSION}.jar -t ${IMAGE_NAME} ${PROJECT_NAME}/src/environment/docker
+              sudo podman tag ${IMAGE_NAME} ${IMAGE_NAME}:${VERSION}
+             """          
         }
      
     stage('Publish image to Docker Hub') {
@@ -56,7 +48,7 @@ node {
                     #!/bin/bash
                     #IMAGE=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${IMAGE_NAME}
                     IMAGE=${DOCKER_REGISTRY}/${IMAGE_NAME}
-                    IMAGE_WITH_TAG=\${IMAGE}:${BUILD_NUMBER}
+                    IMAGE_WITH_TAG=\${IMAGE}:${VERSION}
                     sudo podman login -u \$USERNAME -p \$PASSWORD ${DOCKER_REGISTRY_URL}
                     sudo podman push \${IMAGE_WITH_TAG}  
                     sudo podman logout ${DOCKER_REGISTRY_URL}
