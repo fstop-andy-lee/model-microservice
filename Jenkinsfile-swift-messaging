@@ -6,7 +6,8 @@ node {
     def  DOCKER_NAMESPACE = 'default'
     def  DOCKER_USER = 'andylee1973'
     def  PROJECT_NAME = 'swift-messaging'
-    def  IMAGE_NAME = 'andylee1973/swift-messaging'      
+    def  IMAGE_NAME = 'andylee1973/swift-messaging'  
+    def  MANIFEST_JOB = 'java-swift-messaging-manifest'    
         
     environment {
       DOCKERHUB_TOKEN = credentials(DOCKERHUB_TOKEN_ID)
@@ -56,20 +57,10 @@ node {
                    """
               }  
           
-        }     
-    /*
-    stage('Deploy to k8s') {
-           steps {
-              withKubeConfig([credentialsId: 'k8s-api-key']) {
-                sh 'curl -LO "https://storage.googleapis.com/kubernetes-release/release/v1.20.5/bin/linux/amd64/kubectl"'  
-                sh 'chmod u+x ./kubectl'  
-                sh './kubectl get pods'
-                sh '''
-                  PT='{"spec":{"template":{"metadata":{"creationTimestamp":"'${CTS}'"}}}}'
-                  ./kubectl patch  deployment swift-messaging  -p ${PT}
-                '''
-              }               
-           }
-    }
-    */    
+        }  
+        
+    stage('Trigger Manifest Update') {
+        echo "Trigger Manifest Update"
+        build job: MANIFEST_JOB, parameters: [string(name: 'DOCKERTAG', value: VERSION)]
+    }    
 }
