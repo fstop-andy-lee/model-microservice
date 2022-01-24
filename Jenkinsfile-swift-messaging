@@ -58,7 +58,7 @@ node {
               }  
           
         }  
-         
+        
     stage('Trigger Manifest Update') {
         echo "Trigger Manifest Update"
         build job: MANIFEST_JOB, parameters: [string(name: 'DOCKERTAG', value: VERSION)]
