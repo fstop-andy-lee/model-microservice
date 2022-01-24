@@ -1,0 +1,66 @@
+node {
+
+    def  DOCKERHUB_TOKEN_ID = 'fstop-andy-lee-dockerhub-token'     
+    def  DOCKER_REGISTRY = 'docker.io'
+    def  DOCKER_REGISTRY_URL = 'https://docker.io'
+    def  DOCKER_NAMESPACE = 'default'
+    def  DOCKER_USER = 'andylee1973'
+    def  PROJECT_NAME = 'aml-service'
+    def  IMAGE_NAME = 'andylee1973/aml-service'  
+    def  MANIFEST_JOB = 'java-aml-service-manifest'    
+        
+    environment {
+      DOCKERHUB_TOKEN = credentials(DOCKERHUB_TOKEN_ID)
+      CTS = sh(script:'date +%Y-%m-%dT%H:%M:00Z', returnStdout: true).trim()	  
+	  }
+      
+    stage('Checkout Source') {         
+          checkout scm
+        }
+    stage('Execute Maven') {
+	       
+         VERSION = sh(script:'cd ./${PROJECT_NAME} && mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
+         echo "${VERSION}"        
+         sh """
+             #!/bin/bash
+             whoami
+             env
+             mvn clean package -DskipTests
+             rm ./${PROJECT_NAME}/src/environment/docker/lib/dummy
+             cp ./${PROJECT_NAME}/target/${PROJECT_NAME}-${VERSION}.jar ./${PROJECT_NAME}/src/environment/docker/lib/.
+             cp ./${PROJECT_NAME}/src/main/resources/*.yml ./${PROJECT_NAME}/src/environment/docker/conf/.
+            """     
+            
+        }
+    stage('Docker Build and Tag') {
+          VERSION = sh(script:'cd ./${PROJECT_NAME} && mvn org.apache.maven.plugins:maven-help-plugin:3.1.0:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true).trim()
+          echo "${VERSION}" 
+          sh """
+              #!/bin/bash
+              IMAGE=${DOCKER_REGISTRY}/${IMAGE_NAME}
+              sudo podman build --build-arg JAR_NAME=${PROJECT_NAME}-${VERSION}.jar -t \${IMAGE} ${PROJECT_NAME}/src/environment/docker
+              sudo podman tag \${IMAGE} \${IMAGE}:${VERSION}
+             """          
+        }
+     
+    stage('Publish image to Docker Hub') {
+           
+              withCredentials([usernamePassword(credentialsId: DOCKERHUB_TOKEN_ID, passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                sh """
+                    #!/bin/bash
+                    #IMAGE=${DOCKER_REGISTRY}/${DOCKER_NAMESPACE}/${IMAGE_NAME}
+                    IMAGE=${DOCKER_REGISTRY}/${IMAGE_NAME}
+                    IMAGE_WITH_TAG=\${IMAGE}:${VERSION}
+                    sudo podman login -u \$USERNAME -p \$PASSWORD ${DOCKER_REGISTRY_URL}
+                    sudo podman push \${IMAGE_WITH_TAG}  
+                    sudo podman logout ${DOCKER_REGISTRY_URL}
+                   """
+              }  
+          
+        }  
+        
+    stage('Trigger Manifest Update') {
+        echo "Trigger Manifest Update"
+        build job: MANIFEST_JOB, parameters: [string(name: 'DOCKERTAG', value: VERSION)]
+    }    
+}
