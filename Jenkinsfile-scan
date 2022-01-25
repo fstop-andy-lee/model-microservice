@@ -1,0 +1,15 @@
+node {
+  stage('SCM') {
+    checkout scm
+  }
+  stage('SonarQube Analysis') {
+    sh """
+        #!/bin/bash
+        
+        mvn clean verify sonar:sonar \
+        -Dsonar.projectKey=model-microservice \
+        -Dsonar.host.url=http://10.107.65.162:9000 \
+        -Dsonar.login=e20f72b9a322b03ae466221423e84fe6e73cd30a
+       """    
+  }
+}
