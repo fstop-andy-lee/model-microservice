@@ -61,7 +61,14 @@
     <sonar.sources>src/main</sonar.sources>
     <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
 	-->
-	
+  <!-- SonarQube -->
+    <sonar.host.url>http://10.107.65.162:9000</sonar.host.url>
+    <sonar.projectKey>model-microservice</sonar.projectKey>
+    <sonar.projectName>model-microservice</sonar.projectName>
+    <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
+    <sonar.exclusions>src/main/resources/static/assets/javascripts/lib/**,**/*.js</sonar.exclusions>
+    <sonar.sources>swift-messaging/src/main</sonar.sources>
+    
     <!-- Jenkins Maven Project public junit report 
     <jenkins.e2eTests.reportsDirectory>target/protractor-reports</jenkins.e2eTests.reportsDirectory>
 	-->
