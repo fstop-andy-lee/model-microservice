@@ -198,6 +198,7 @@
       </plugins>
   </reporting>
   
+  <!--
   <dependencyManagement>
     <dependencies>
         <dependency>
@@ -209,12 +210,15 @@
         </dependency>
     </dependencies>
   </dependencyManagement>
-
+  -->
+  
   <repositories>
+    <!--
     <repository>
       <id>nexus</id>
       <url>http://10.107.65.163:8081/repository/maven-central/</url>
     </repository>
+    -->
     <repository>
         <id>spring-snapshots</id>
         <name>Spring Snapshots</name>
@@ -230,15 +234,18 @@
         <snapshots>
             <enabled>false</enabled>
         </snapshots>
-    </repository>    
+    </repository>
   </repositories>
   
   <pluginRepositories>
+    <!--
     <pluginRepository>
       <id>central</id>
       <url>http://10.107.65.163:8081/repository/maven-central/</url>
       <layout>default</layout>
     </pluginRepository>
+    -->
+    
     <pluginRepository>
         <id>spring-snapshots</id>
         <name>Spring Snapshots</name>
@@ -257,6 +264,7 @@
     </pluginRepository>
   </pluginRepositories>
   
+  <!--
   <distributionManagement>
 		<repository>
 		<id>nexus</id>
@@ -269,7 +277,8 @@
 		<url>http://10.107.65.163:8081/repository/maven-snapshots/</url>
 		</snapshotRepository>
   </distributionManagement>
-
+  -->
+  
   <modules>  
     <module>parent-boot-2</module>      
     <module>common-spring</module>
