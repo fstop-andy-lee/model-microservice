@@ -343,4 +343,12 @@
 
   </build>  
   
+  <repositories>
+    <repository>
+      <id>palsys</id>
+      <url>http://10.107.65.163:8081/repository/maven-central/</url>
+      <layout>default</layout>
+    </repository>    
+  </repositories>
+  
 </project>
