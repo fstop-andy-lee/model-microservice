@@ -67,7 +67,8 @@
     <sonar.projectName>model-microservice</sonar.projectName>
     <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
     <sonar.exclusions>src/main/resources/static/assets/javascripts/lib/**,**/*.js</sonar.exclusions>
-    <sonar.sources>swift-messaging/src/main</sonar.sources>
+    <sonar.sources>src/main</sonar.sources>
+    <sonar-maven-plugin.version>3.9.1.2184</sonar-maven-plugin.version>
     
     <!-- Jenkins Maven Project public junit report 
     <jenkins.e2eTests.reportsDirectory>target/protractor-reports</jenkins.e2eTests.reportsDirectory>
@@ -137,6 +138,15 @@
   </dependencies>
 
   <build>
+      <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${sonar-maven-plugin.version}</version>
+                </plugin>
+            </plugins>
+      </pluginManagement>
       <plugins>
           <plugin>
               <groupId>org.apache.maven.plugins</groupId>
@@ -191,7 +201,6 @@
                   </dependency>
               </dependencies>
           </plugin>
-          
       </plugins>          
   </build>
   
