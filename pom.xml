@@ -196,14 +196,6 @@
       <id>palsys</id>
       <url>http://10.107.65.163:8081/repository/maven-central/</url>
     </repository> 
-    <repository>
-      <id>spring-milestones</id>
-      <name>Spring Milestones</name>
-      <url>https://repo.spring.io/libs-milestone</url>
-      <snapshots>
-         <enabled>false</enabled>
-      </snapshots>
-    </repository>    
   </repositories>
   
   <pluginRepositories>
