@@ -5,8 +5,9 @@ node {
   stage('SonarQube Analysis') {
     sh """
         #!/bin/bash
+        mvn clean package -DskipTests
         export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-11.0.14.0.9-1.el7_9.x86_64
-        mvn clean verify sonar:sonar \
+        mvn sonar:sonar \
         -Dsonar.projectKey=model-microservice \
         -Dsonar.host.url=http://10.107.65.162:9000 \
         -Dsonar.login=e20f72b9a322b03ae466221423e84fe6e73cd30a
