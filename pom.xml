@@ -191,6 +191,12 @@
       </plugins>
   </reporting>
   
+  <repositories>
+    <repository>
+      <id>palsys</id>
+      <url>http://10.107.65.163:8081/repository/maven-central/</url>
+    </repository>    
+  </repositories>
 
   <modules>  
     <module>parent-boot-2</module>      
