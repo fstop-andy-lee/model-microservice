@@ -195,8 +195,37 @@
     <repository>
       <id>palsys</id>
       <url>http://10.107.65.163:8081/repository/maven-central/</url>
+    </repository> 
+    <repository>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/libs-milestone</url>
+      <snapshots>
+         <enabled>false</enabled>
+      </snapshots>
     </repository>    
   </repositories>
+  
+  <pluginRepositories>
+    <pluginRepository>
+      <id>central</id>
+      <url>http://10.107.65.163:8081/repository/maven-central/</url>
+      <layout>default</layout>
+    </pluginRepository>
+  </pluginRepositories>
+  
+  <distributionManagement>
+		<repository>
+		<id>nexus</id>
+		<name>maven-releases</name>
+		<url>http://10.107.65.163:8081/repository/maven-releases/</url>
+		</repository>
+		<snapshotRepository>
+		<id>nexus</id>
+		<name>maven-snapshots</name>
+		<url>http://10.107.65.163:8081/repository/maven-snapshots/</url>
+		</snapshotRepository>
+  </distributionManagement>
 
   <modules>  
     <module>parent-boot-2</module>      
