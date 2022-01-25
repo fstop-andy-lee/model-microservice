@@ -123,7 +123,7 @@
     <dependency>
       <groupId>com.github.ulisesbocchio</groupId>
       <artifactId>jasypt-spring-boot-starter</artifactId>
-      <version>2.0.1</version>
+      <version>3.0.4</version>
       <scope>compile</scope>
     </dependency>
             
@@ -202,9 +202,31 @@
     <repository>
       <id>palsys</id>
       <url>http://10.107.65.163:8081/repository/maven-central/</url>
+    </repository>
+
+    <repository>
+      <id>spring-milestones</id>
+      <name>Spring Milestones</name>
+      <url>https://repo.spring.io/libs-milestone</url>
+      <snapshots>
+          <enabled>false</enabled>
+      </snapshots>
     </repository> 
+      
   </repositories>
   
+  <dependencyManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-dependencies</artifactId>
+            <version>Finchley.M8</version>
+            <type>pom</type>
+            <scope>import</scope>
+        </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <pluginRepositories>
     <pluginRepository>
       <id>central</id>
