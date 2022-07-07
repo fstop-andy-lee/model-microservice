@@ -69,7 +69,7 @@
     <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
 	-->
   <!-- SonarQube -->
-    <sonar.host.url>http://10.107.65.162:9000</sonar.host.url>
+    <sonar.host.url>http://10.109.110.203:9000</sonar.host.url>
     <!--<sonar.projectKey>model-microservice</sonar.projectKey>-->
     <!--<sonar.projectName>model-microservice</sonar.projectName>-->
     <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
