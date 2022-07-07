@@ -28,10 +28,10 @@ pipeline {
                 sh """
                     #!/bin/bash
                     mvn clean package -DskipTest
-                    mvn clean verify sonar:sonar
-                    -Dsonar.projectKey=swift-messaging
-                    -Dsonar.host.url=http://sonarqube.fstop.com.tw:9000
-                    -Dsonar.login=fcbuser
+                    mvn clean verify sonar:sonar \
+                    -Dsonar.projectKey=swift-messaging \
+                    -Dsonar.host.url=http://sonarqube.fstop.com.tw:9000 \
+                    -Dsonar.login=fcbuser \
                     -Dsonar.password=123qwe
                 """
             }
