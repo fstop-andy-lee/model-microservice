@@ -30,8 +30,9 @@ pipeline {
                     mvn clean package -DskipTest
                     mvn clean verify sonar:sonar
                     -Dsonar.projectKey=swift-messaging
-                    -Dsonar.host.url=http://10.109.110.203:9000
-                    -Dsonar.login=sqp_2c15f0f41d1df4c589d08bf9d2dcb04f8ecd429b
+                    -Dsonar.host.url=http://sonarqube.fstop.com.tw:9000
+                    -Dsonar.login=fcbuser
+                    -Dsonar.password=123qwe
                 """
             }
         }
