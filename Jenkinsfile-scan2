@@ -1,0 +1,42 @@
+pipeline {
+    
+    agent {
+        label "podman-agent"
+    }
+    
+    tools {
+        maven "Maven 3"
+    }
+    
+    environment {
+        REGISTRY = "harbor.fstop.com.tw"
+        NAMESPACE = "model-microservice"
+        IMAGE_NAME= "swift-messaging"
+        CREDENTIALSID = ""
+    }
+    
+    stages {
+        
+        stage("Checkout Source") {
+            steps {             
+                git branch: 'develop', url: 'https://github.com/fstop-andy-lee/model-microservice.git'        
+            }
+        }
+        
+        stage("Sonarqbue Analysis") {
+            steps {
+                sh """
+                    #!/bin/bash
+                    mvn clean package -DskipTest
+                    mvn clean verify sonar:sonar
+                    -Dsonar.projectKey=swift-messaging
+                    -Dsonar.host.url=http://10.109.110.203:9000
+                    -Dsonar.login=sqp_2c15f0f41d1df4c589d08bf9d2dcb04f8ecd429b
+                """
+            }
+        }
+        
+        
+        
+    }
+}
