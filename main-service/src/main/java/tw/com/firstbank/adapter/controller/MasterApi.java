@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import tw.com.firstbank.model.MasterDto;
+import tw.com.firstbank.model.SagaGenericDto;
 
 
 @Api(tags="Master API", produces=MediaType.APPLICATION_JSON_VALUE)
@@ -61,4 +62,14 @@ public interface MasterApi {
   ResponseEntity<String> testMq(
       @ApiParam(value = "msg", required = false)
       @RequestParam(name = "msg", required = false, defaultValue="this is a test") String msg);
+  
+  @ApiOperation(value="start camunda saga flow", notes="start camunda saga flow")
+  @ApiResponses(value = {
+      @ApiResponse(code = 201, message  = "message sent"),
+      @ApiResponse(code = 400, message = "invalid input, object invalid")
+      })
+  @RequestMapping(value = "/api/camunda/saga/start", consumes = {"application/json"}, method = RequestMethod.POST)
+  ResponseEntity<SagaGenericDto<MasterDto>> startCamundaSAGAFlow(
+      @ApiParam(value = "MasterDto", required = true)
+      @Valid @RequestBody SagaGenericDto<MasterDto> body);
 }

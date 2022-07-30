@@ -18,7 +18,17 @@
   <properties>
 <!--     <springfox-version>2.9.2</springfox-version>  -->    
     <springfox-version>3.0.0</springfox-version>
+    <zeebe-client-java-version>8.0.4</zeebe-client-java-version>
+    <spring-zeebe-starter-version>8.0.7</spring-zeebe-starter-version>
+    <spring-zeebe-version>8.0.7</spring-zeebe-version>
   </properties>
+  
+  <repositories>
+  	<repository>
+    	<id>Internal repository</id>
+    	<url>file://${basedir}/repo</url>
+  	</repository>
+  </repositories>
     
   <dependencies>
     <dependency>
@@ -168,6 +178,23 @@
       <scope>runtime</scope>
     </dependency>
     
+    <!-- camunda -->
+    <dependency>
+      <groupId>io.camunda</groupId>
+      <artifactId>spring-zeebe</artifactId>
+      <version>${spring-zeebe-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.camunda</groupId>
+      <artifactId>spring-zeebe-starter</artifactId>
+      <version>${spring-zeebe-starter-version}</version>
+    </dependency>
+    <dependency>
+      <groupId>io.camunda</groupId>
+      <artifactId>zeebe-client-java</artifactId>
+      <version>${zeebe-client-java-version}</version>
+    </dependency>
+    
     <!-- Utility -->
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -212,7 +239,16 @@
       <artifactId>spring-boot-devtools</artifactId>
       <optional>true</optional>
     </dependency>
-
+    
+    <dependency>
+      <groupId>org.apache.maven.surefire</groupId>
+      <artifactId>surefire-logger-api</artifactId>
+      <version>2.22.2</version>
+      <!-- to get around bug https://github.com/junit-team/junit5/issues/1367 -->
+      <scope>test</scope>
+      <optional>true</optional>
+    </dependency>
+    
   </dependencies>
   
   <build>
@@ -292,14 +328,236 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.21.0</version>
+        <version>2.22.2</version>
         <configuration>
-          <skipTests>true</skipTests>
+          <testFailureIgnore>true</testFailureIgnore>
+          <skipTests>false</skipTests>
         </configuration>
       </plugin>
+      
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.7</version>
+        <executions>
+          <execution>
+            <id>default-prepare-agent</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+			<id>post-unit-test</id>
+			<phase>test</phase>
+			<goals>
+			  <goal>report</goal>
+			</goals>
+			<configuration>
+			  <dataFile>target/jacoco.exec</dataFile>
+			  <outputDirectory>target/jacoco-ut</outputDirectory>
+			</configuration>
+		  </execution>
+        </executions>
+       </plugin>
 
     </plugins>
 
-  </build>  
+  </build>
   
+  <profiles>
+    <profile>
+      <id>depchk</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>        
+      </activation>
+      <build>
+		<plugins>
+		  <!--- mvn clean verify -Pdepchk -->
+		  <plugin>
+		  	<groupId>org.owasp</groupId>
+		  	<artifactId>dependency-check-maven</artifactId>
+		  	<version>7.1.1</version>
+		  	<!-- 
+		  	<configuration>
+		  		<cveUrlModified>http://internal-mirror.mycorp.com/nvdcve-1.1-modified.json.gz</cveUrlModified>
+                <cveUrlBase>http://internal-mirror.mycorp.com/nvdcve-1.1-%d.json.gz</cveUrlBase>
+		  		<format>ALL</format>
+		  		<skipProvidedScope>true</skipProvidedScope>
+		  		<skipRuntimeScope>true</skipRuntimeScope>
+		  	</configuration>
+		  	 -->
+		  	<executions>
+		  		<execution>
+		  			<goals>
+		  				<goal>check</goal>
+		  			</goals>
+		  		</execution>
+		  	</executions>		  	
+		  </plugin>		  
+	    </plugins>
+	  </build>				
+    </profile>
+    <profile>
+      <id>stylechk</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>        
+      </activation>
+      <build>
+		<plugins>
+		  <!--- mvn clean verify -Pstylechk -->
+		  <plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-checkstyle-plugin</artifactId>
+			<version>3.1.1</version>
+			<executions>
+			  <execution>
+				<id>verify-style</id>
+				<phase>process-classes</phase>
+				<goals>
+				  <goal>check</goal>
+				</goals>
+				<configuration>
+				  <failOnViolation>true</failOnViolation>
+				</configuration>
+			  </execution>
+			</executions>
+		  </plugin>		  
+	    </plugins>
+	  </build>				
+    </profile>
+    <profile>
+      <id>testrpt</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>        
+      </activation>
+      <build>
+		<plugins>
+		  <!--- mvn clean verify -Ptestrpt -->
+		  <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.7</version>
+            <executions>
+                <execution>
+                    <id>default-prepare-agent</id>
+                    <goals>
+                        <goal>prepare-agent</goal>
+                    </goals>
+                </execution>
+                <execution>
+				  <id>post-unit-test</id>
+				  <phase>test</phase>
+				  <goals>
+				  	<goal>report</goal>
+				  </goals>
+				  <configuration>
+				  	<dataFile>target/jacoco.exec</dataFile>
+				  	<outputDirectory>target/jacoco-ut</outputDirectory>
+				  </configuration>
+				</execution>
+            </executions>
+          </plugin>		  
+	    </plugins>
+	  </build>				
+    </profile>
+    <profile>
+      <id>pmdchk</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>        
+      </activation>
+      <build>
+		<plugins>
+		  <!--- mvn clean validate -Ppmdchk / mvn pmd:pmd -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <version>3.17.0</version>
+            <configuration>
+              <sourceEncoding>utf-8</sourceEncoding>
+              <excludes>
+                <exclude>**/*Bean.java</exclude>
+                <exclude>**/generated/*.java</exclude>
+              </excludes>
+              <excludeRoots>
+                <excludeRoot>target/generated-sources/stubs</excludeRoot>
+              </excludeRoots>
+              <rulesets>
+                <!-- A rule set, that comes bundled with PMD -->
+                <ruleset>${project.basedir}/pmd-rules.xml</ruleset>
+                
+                <!-- 
+                <ruleset>/category/java/performance.xml</ruleset>
+                <ruleset>/category/java/multithreading.xml</ruleset>
+                <ruleset>/category/java/errorprone.xml</ruleset>
+                <ruleset>/category/java/design.xml</ruleset>
+                <ruleset>/category/java/codestyle.xml</ruleset>
+                <ruleset>/category/java/bestpractices.xml</ruleset>
+                <ruleset>d:\rulesets\strings.xml</ruleset>
+                <ruleset>http://localhost/design.xml</ruleset>
+                -->
+              </rulesets>
+            </configuration>
+            <executions>
+			  <execution>
+			    <phase>validate</phase>
+			    <goals>
+			      <goal>pmd</goal>
+			    </goals>
+			  </execution>
+			</executions>
+          </plugin>		  
+	    </plugins>
+	  </build>				
+    </profile>
+  </profiles>      
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jxr-plugin</artifactId>
+        <version>3.0.0</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-checkstyle-plugin</artifactId>
+        <version>3.1.1</version>
+      </plugin>
+      <plugin>
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <reportSets>
+          <reportSet>
+            <reports>
+              <report>report</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
+      <!-- mvn pmd:pmd -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-pmd-plugin</artifactId>
+        <version>3.17.0</version>
+        <configuration>
+          <sourceEncoding>utf-8</sourceEncoding>
+          <excludes>
+            <exclude>**/*Bean.java</exclude>
+            <exclude>**/generated/*.java</exclude>
+          </excludes>
+          <excludeRoots>
+            <excludeRoot>target/generated-sources/stubs</excludeRoot>
+          </excludeRoots>
+          <rulesets>
+                <!-- A rule set, that comes bundled with PMD -->
+                <ruleset>/category/java/codestyle.xml</ruleset>
+                <!-- 
+                <ruleset>/category/java/bestpractices.xml</ruleset>
+                <ruleset>d:\rulesets\strings.xml</ruleset>
+                <ruleset>http://localhost/design.xml</ruleset>
+                -->
+          </rulesets>
+        </configuration>
+      </plugin>
+    </plugins>
+  </reporting>
 </project>

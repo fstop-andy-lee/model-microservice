@@ -61,28 +61,28 @@ spring:
       enabled: false
 
   # RabbitMQ properties
-  rabbitmq:
-   addresses: localhost:5672
-   adminAddresses: http://localhost:15672
-   nodes: rabbit@localhost
-   username: guest
-   password: guest
-   virtual-host: /
-   useSSL: false
-   sslProperties:
-   ssl:
-     keyStore:
-     keyStorePassphrase:
-     trustStore:
-     trustStorePassphrase:
-   channelCacheSize: 100
-   listener:
-     simple:
-       default-requeue-rejected: false
-       retry:
-         enabled: true
-       # auto, manual
-       acknowledge-mode: auto
+#  rabbitmq:
+#   addresses: localhost:5672
+#   adminAddresses: http://localhost:15672
+#   nodes: rabbit@localhost
+#   username: guest
+#   password: guest
+#   virtual-host: /
+#   useSSL: false
+#   sslProperties:
+#   ssl:
+#     keyStore:
+#     keyStorePassphrase:
+#     trustStore:
+#     trustStorePassphrase:
+#   channelCacheSize: 100
+#   listener:
+#     simple:
+#       default-requeue-rejected: false
+#       retry:
+#         enabled: true
+#       # auto, manual
+#       acknowledge-mode: auto
 
 
 security:
@@ -96,7 +96,7 @@ logging:
   level:
     tw.com.firstbank: DEBUG
 #    org.hibernate.SQL: DEBUG
-#    org.springframework: DEBUG
+    org.springframework: DEBUG
 #    org.springframework.http.client: DEBUG
     org.springframework.web: DEBUG
     org.springframework.web.client.RestTemplate: DEBUG

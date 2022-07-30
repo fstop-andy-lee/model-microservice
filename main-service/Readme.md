@@ -11,3 +11,10 @@
 curl -v -i -X POST -H "Content-Type:application/json" -d '{  "id" : "Test", "balance" : 0 }' http://localhost:8080/masters
 
 
+# install camunda spring starter
+
+custom camunda spring starter artifact install
+```
+mvn install:install-file -Dfile=spring-zeebe-8.0.6-SNAPSHOT.jar -DgroupId=io.camunda -DartifactId=spring-zeebe -Dversion=8.0.6-SNAPSHOT -Dpackaging=jar
+mvn install:install-file -Dfile=spring-zeebe-starter-8.0.6-SNAPSHOT.jar -DgroupId=io.camunda -DartifactId=spring-zeebe-starter -Dversion=8.0.6-SNAPSHOT -Dpackaging=jar
+```

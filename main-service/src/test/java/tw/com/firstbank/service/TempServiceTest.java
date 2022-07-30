@@ -28,7 +28,7 @@ public class TempServiceTest {
   @Autowired
   TempService tempService;
   
-  @Test
+  //@Test
   public void testSave() {
     String id = "10-110-1234";
     Integer amt = 100;

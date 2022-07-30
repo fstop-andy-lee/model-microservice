@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tw.com.firstbank.annotation.WebAdapter;
 import tw.com.firstbank.model.MasterDto;
+import tw.com.firstbank.model.SagaGenericDto;
+import tw.com.firstbank.service.CamundaTaskService;
 import tw.com.firstbank.service.MasterService;
 
 @WebAdapter
@@ -21,6 +23,9 @@ public class MasterController implements MasterApi {
 
   @Autowired
   MasterService masterService;
+
+  @Autowired
+  CamundaTaskService camundaTaskService;
   
   @Override
   public ResponseEntity<String> saveMaster(@Valid MasterDto body) {
@@ -101,4 +106,14 @@ public class MasterController implements MasterApi {
         HttpStatus.OK);
   }
 
+  @Override
+  public ResponseEntity<SagaGenericDto<MasterDto>> startCamundaSAGAFlow(@Valid SagaGenericDto<MasterDto> body) {
+    
+    camundaTaskService.startTask(body);
+    
+    return new ResponseEntity<>(
+        body, 
+        HttpStatus.OK);
+  }
+  
 }

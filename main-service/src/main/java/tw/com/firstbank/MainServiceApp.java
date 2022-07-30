@@ -9,6 +9,8 @@ import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.core.env.Environment;
 
+import io.camunda.zeebe.spring.client.EnableZeebeClient;
+
 /**
  * For deploy to application server and running in stand alone mode, first the application entry
  * class should extend SpringBootServletInitializer, second the application entry class should
@@ -21,6 +23,7 @@ import org.springframework.core.env.Environment;
  * 
  */
 @SpringBootApplication
+@EnableZeebeClient
 public class MainServiceApp extends SpringBootServletInitializer {
   private static final Logger log = LoggerFactory.getLogger(MainServiceApp.class);
 

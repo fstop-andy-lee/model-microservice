@@ -27,7 +27,7 @@ public class MasterServiceTest {
   @Autowired
   MasterService masterService;
   
-  @Test
+  //@Test
   public void testSave() {
     String id = "10-110-1234";
     Integer amt = 100;
@@ -45,7 +45,7 @@ public class MasterServiceTest {
     assertTrue(m.getHoldMark() == null);
   }
   
-  @Test(expected = IllegalStateException.class)
+  //@Test(expected = IllegalStateException.class)
   public void expectedIllegalStateException() {
     // given
     String id = "10-110-1234";

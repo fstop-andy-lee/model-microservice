@@ -1,0 +1,2 @@
+start /WAIT mvn install:install-file -Dfile=.\lib\spring-zeebe-8.0.7.jar -DgroupId=io.camunda -DartifactId=spring-zeebe -Dversion=8.0.7 -Dpackaging=jar -DlocalRepositoryPath=.\repo
+start /WAIT mvn install:install-file -Dfile=.\lib\spring-zeebe-starter-8.0.7.jar -DgroupId=io.camunda -DartifactId=spring-zeebe-starter -Dversion=8.0.7 -Dpackaging=jar -DlocalRepositoryPath=.\repo

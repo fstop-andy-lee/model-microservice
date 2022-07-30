@@ -25,7 +25,7 @@ public class ServiceLogTest {
   @Autowired
   ServiceLog0Repository log0Repo;
   
-  @Test
+  //@Test
   public void testRepo() {
     String id = UUID.randomUUID().toString();
     Integer seq = 0;

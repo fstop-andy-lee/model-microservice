@@ -24,14 +24,14 @@ public class MasterTest {
   @Autowired
   MasterRepository masterRepo;
   
-  @Test
+  //@Test
   public void testList() {
     
     masterRepo.findAll().forEach(x -> System.out.println(x.toString()));
     
   }
   
-  @Test
+  //@Test
   public void testSave() {
     Master m = masterRepo.findAll().get(0);
     m.setHoldMark("1");
