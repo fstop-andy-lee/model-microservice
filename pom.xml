@@ -16,7 +16,7 @@
     
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-<!-- 	
+<!--  
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
     <java.source.version>1.8</java.source.version>
@@ -24,13 +24,14 @@
     <jdk.version>1.8</jdk.version>
     <java.version>1.8</java.version>
 -->
+
     <maven.compiler.source>15</maven.compiler.source>
     <maven.compiler.target>15</maven.compiler.target>
-    <java.source.version>11</java.source.version>
-    <java.target.version>11</java.target.version>
+    <java.source.version>15</java.source.version>
+    <java.target.version>15</java.target.version>
     <jdk.version>15</jdk.version>
     <java.version>15</java.version>
-
+ 
     <lombok.version>1.18.18</lombok.version>
     <esapi.version>2.1.0.1</esapi.version>
 

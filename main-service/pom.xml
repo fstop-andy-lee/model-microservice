@@ -194,6 +194,19 @@
       <artifactId>zeebe-client-java</artifactId>
       <version>${zeebe-client-java-version}</version>
     </dependency>
+    <!-- 
+    <dependency>
+	  <groupId>org.camunda.bpm</groupId>
+	  <artifactId>camunda-engine</artifactId>
+	  <version>7.1.0-Final</version>
+    </dependency>
+    -->
+    <!-- GeneratedMessageV3.isStringEmpty() only in version 3.18+ -->
+    <dependency>
+      <groupId>com.google.protobuf</groupId>
+      <artifactId>protobuf-java</artifactId>
+      <version>3.19.4</version>
+    </dependency>
     
     <!-- Utility -->
     <dependency>

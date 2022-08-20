@@ -17,6 +17,9 @@ spring:
   application:
     name: main-service
 
+  profiles:
+    active: develop
+
   ## enabling overriding by setting spring.main.allow-bean-definition-overriding=true
   main:
     allow-bean-definition-overriding: true

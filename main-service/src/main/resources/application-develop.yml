@@ -21,6 +21,14 @@ spring:
 zeebe:
   client:
     broker:
-      gateway-address: 127.0.0.1:26500
+      gatewayAddress: 127.0.0.1:26500
+    worker:
+      defaultName: MainOrchestrator
     security:
       plaintext: true
+
+# grpc default to TLS
+#grpc:
+#  client:
+#    _server_name_:
+#      negotiationType: PLAINTEXT

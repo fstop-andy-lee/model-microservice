@@ -12,7 +12,6 @@ import tw.com.firstbank.model.MasterDto;
 public class TestChannelImpl implements TestChannel {
 
   @Override
-  //public void listen(Message msg) {
   public void listen(MasterDto msg) {  
     log.debug("Message read from Queue : " + msg.toString());
   }

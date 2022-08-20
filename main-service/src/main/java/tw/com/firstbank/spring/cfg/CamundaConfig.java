@@ -19,10 +19,10 @@ public class CamundaConfig {
    * No visible constructors in class java.util.concurrent.Executors$DelegatedScheduledExecutorService
    * @return
    */
-  @Bean()
-  public ScheduledExecutorService scheduledExecutorService() {
-    return Executors.newScheduledThreadPool(1);    
-  }
+//  @Bean()
+//  public ScheduledExecutorService scheduledExecutorService() {
+//    return Executors.newScheduledThreadPool(1);    
+//  }
   
 
 }

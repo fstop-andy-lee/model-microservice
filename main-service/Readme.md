@@ -1,4 +1,5 @@
 # URL
+  http://localhost:8080/swagger-ui.html
   http://localhost:8080/masters
   http://localhost:8080/log0s
   http://localhost:8080/log1s
@@ -18,3 +19,20 @@ custom camunda spring starter artifact install
 mvn install:install-file -Dfile=spring-zeebe-8.0.6-SNAPSHOT.jar -DgroupId=io.camunda -DartifactId=spring-zeebe -Dversion=8.0.6-SNAPSHOT -Dpackaging=jar
 mvn install:install-file -Dfile=spring-zeebe-starter-8.0.6-SNAPSHOT.jar -DgroupId=io.camunda -DartifactId=spring-zeebe-starter -Dversion=8.0.6-SNAPSHOT -Dpackaging=jar
 ```
+
+# camunda
+
+## tasklist
+
+URL: http://localhost:8082/login
+     demo / demo
+
+## Operate
+
+URL: http://localhost:8081/
+     demo / demo
+
+##
+
+
+
